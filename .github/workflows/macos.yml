@@ -16,7 +16,7 @@ jobs:
       AUTOMATED_TESTING: 1
       RELEASE_TESTING: 1
 
-    runs-on: macOS-latest
+    runs-on: macos-13
 
     strategy:
       fail-fast: false
