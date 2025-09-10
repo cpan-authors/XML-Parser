@@ -741,7 +741,7 @@ elementDecl(void *data,
 
   cmod = generate_model(model);
 
-  Safefree(model);
+  XML_FreeContentModel(cbv->p, model);
   PUSHMARK(sp);
   EXTEND(sp, 3);
   PUSHs(cbv->self_sv);
