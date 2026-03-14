@@ -2319,4 +2319,47 @@ XML_Do_External_Parse(parser, result)
     OUTPUT:
         RETVAL
 
+#if defined(XML_DTD) && defined(XML_MAJOR_VERSION) \
+    && (XML_MAJOR_VERSION > 2 \
+        || (XML_MAJOR_VERSION == 2 && XML_MINOR_VERSION >= 4))
+
+int
+XML_SetBillionLaughsAttackProtectionMaximumAmplification(parser, maxamp)
+	XML_Parser			parser
+	float				maxamp
+    CODE:
+	RETVAL = (int) XML_SetBillionLaughsAttackProtectionMaximumAmplification(
+	    parser, maxamp);
+    OUTPUT:
+	RETVAL
+
+int
+XML_SetBillionLaughsAttackProtectionActivationThreshold(parser, threshold)
+	XML_Parser			parser
+	unsigned long			threshold
+    CODE:
+	RETVAL = (int) XML_SetBillionLaughsAttackProtectionActivationThreshold(
+	    parser, (unsigned long long) threshold);
+    OUTPUT:
+	RETVAL
+
+#endif
+
+#if defined(XML_MAJOR_VERSION) \
+    && (XML_MAJOR_VERSION > 2 \
+        || (XML_MAJOR_VERSION == 2 \
+            && (XML_MINOR_VERSION > 6 \
+                || (XML_MINOR_VERSION == 6 && XML_MICRO_VERSION >= 0))))
+
+int
+XML_SetReparseDeferralEnabled(parser, enabled)
+	XML_Parser			parser
+	int				enabled
+    CODE:
+	RETVAL = (int) XML_SetReparseDeferralEnabled(parser,
+	    (XML_Bool) enabled);
+    OUTPUT:
+	RETVAL
+
+#endif
 

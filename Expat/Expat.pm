@@ -67,6 +67,21 @@ sub new {
         $self, $args{ProtocolEncoding},
         $args{Namespaces}
     );
+
+    if ( defined $args{BillionLaughsAttackProtectionMaximumAmplification} ) {
+        $self->billion_laughs_attack_protection_maximum_amplification(
+            $args{BillionLaughsAttackProtectionMaximumAmplification}
+        );
+    }
+    if ( defined $args{BillionLaughsAttackProtectionActivationThreshold} ) {
+        $self->billion_laughs_attack_protection_activation_threshold(
+            $args{BillionLaughsAttackProtectionActivationThreshold}
+        );
+    }
+    if ( defined $args{ReparseDeferralEnabled} ) {
+        $self->reparse_deferral_enabled( $args{ReparseDeferralEnabled} );
+    }
+
     $self;
 }
 
@@ -432,6 +447,44 @@ sub skip_until {
         SkipUntil( $self->{Parser}, $_[0] );
     }
 }
+
+################
+# Security API methods (require sufficiently recent libexpat)
+
+sub billion_laughs_attack_protection_maximum_amplification {
+    my ( $self, $factor ) = @_;
+    croak "Usage: \$parser->billion_laughs_attack_protection_maximum_amplification(\$factor)"
+      unless defined $factor;
+    unless ( defined &SetBillionLaughsAttackProtectionMaximumAmplification ) {
+        croak "SetBillionLaughsAttackProtectionMaximumAmplification not available"
+          . " (requires libexpat >= 2.4.0 built with XML_DTD)";
+    }
+    SetBillionLaughsAttackProtectionMaximumAmplification( $self->{Parser}, $factor );
+}
+
+sub billion_laughs_attack_protection_activation_threshold {
+    my ( $self, $threshold ) = @_;
+    croak "Usage: \$parser->billion_laughs_attack_protection_activation_threshold(\$threshold)"
+      unless defined $threshold;
+    unless ( defined &SetBillionLaughsAttackProtectionActivationThreshold ) {
+        croak "SetBillionLaughsAttackProtectionActivationThreshold not available"
+          . " (requires libexpat >= 2.4.0 built with XML_DTD)";
+    }
+    SetBillionLaughsAttackProtectionActivationThreshold( $self->{Parser}, $threshold );
+}
+
+sub reparse_deferral_enabled {
+    my ( $self, $enabled ) = @_;
+    croak "Usage: \$parser->reparse_deferral_enabled(\$enabled)"
+      unless defined $enabled;
+    unless ( defined &SetReparseDeferralEnabled ) {
+        croak "SetReparseDeferralEnabled not available"
+          . " (requires libexpat >= 2.6.0)";
+    }
+    SetReparseDeferralEnabled( $self->{Parser}, $enabled ? 1 : 0 );
+}
+
+################
 
 sub release {
     my $self = shift;
