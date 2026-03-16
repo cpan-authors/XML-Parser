@@ -496,7 +496,7 @@ characterData(void *userData, const char *s, int len)
   PUSHs(cbv->self_sv);
   PUSHs(sv_2mortal(newUTF8SVpvn((char*)s,len)));
   PUTBACK;
-  perl_call_sv(cbv->char_sv, G_DISCARD);
+  perl_call_sv(cbv->char_sv, G_DISCARD|G_VOID);
 
   FREETMPS;
   LEAVE;
@@ -565,7 +565,7 @@ startElement(void *userData, const char *name, const char **atts)
 	    PUSHs(sv_2mortal(newUTF8SVpv((char*)*atts++,0)));
 	}
       PUTBACK;
-      perl_call_sv(cbv->start_sv, G_DISCARD);
+      perl_call_sv(cbv->start_sv, G_DISCARD|G_VOID);
 
       FREETMPS;
       LEAVE;
@@ -601,7 +601,7 @@ endElement(void *userData, const char *name)
       PUSHs(cbv->self_sv);
       PUSHs(elname);
       PUTBACK;
-      perl_call_sv(cbv->end_sv, G_DISCARD);
+      perl_call_sv(cbv->end_sv, G_DISCARD|G_VOID);
 
       FREETMPS;
       LEAVE;
@@ -627,7 +627,7 @@ processingInstruction(void *userData, const char *target, const char *data)
   PUSHs(sv_2mortal(newUTF8SVpv((char*)target,0)));
   PUSHs(sv_2mortal(newUTF8SVpv((char*)data,0)));
   PUTBACK;
-  perl_call_sv(cbv->proc_sv, G_DISCARD);
+  perl_call_sv(cbv->proc_sv, G_DISCARD|G_VOID);
 
   FREETMPS;
   LEAVE;
@@ -647,7 +647,7 @@ commenthandle(void *userData, const char *string)
   PUSHs(cbv->self_sv);
   PUSHs(sv_2mortal(newUTF8SVpv((char*) string, 0)));
   PUTBACK;
-  perl_call_sv(cbv->cmnt_sv, G_DISCARD);
+  perl_call_sv(cbv->cmnt_sv, G_DISCARD|G_VOID);
 
   FREETMPS;
   LEAVE;
@@ -666,7 +666,7 @@ startCdata(void *userData)
     PUSHMARK(sp);
     XPUSHs(cbv->self_sv);
     PUTBACK;
-    perl_call_sv(cbv->startcd_sv, G_DISCARD);
+    perl_call_sv(cbv->startcd_sv, G_DISCARD|G_VOID);
 
     FREETMPS;
     LEAVE;
@@ -686,7 +686,7 @@ endCdata(void *userData)
     PUSHMARK(sp);
     XPUSHs(cbv->self_sv);
     PUTBACK;
-    perl_call_sv(cbv->endcd_sv, G_DISCARD);
+    perl_call_sv(cbv->endcd_sv, G_DISCARD|G_VOID);
 
     FREETMPS;
     LEAVE;
@@ -707,7 +707,7 @@ nsStart(void *userdata, const XML_Char *prefix, const XML_Char *uri){
   PUSHs(prefix ? sv_2mortal(newUTF8SVpv((char *)prefix, 0)) : &PL_sv_undef);
   PUSHs(uri ? sv_2mortal(newUTF8SVpv((char *)uri, 0)) : &PL_sv_undef);
   PUTBACK;
-  perl_call_method("NamespaceStart", G_DISCARD);
+  perl_call_method("NamespaceStart", G_DISCARD|G_VOID);
 
   FREETMPS;
   LEAVE;
@@ -726,7 +726,7 @@ nsEnd(void *userdata, const XML_Char *prefix) {
   PUSHs(cbv->self_sv);
   PUSHs(prefix ? sv_2mortal(newUTF8SVpv((char *)prefix, 0)) : &PL_sv_undef);
   PUTBACK;
-  perl_call_method("NamespaceEnd", G_DISCARD);
+  perl_call_method("NamespaceEnd", G_DISCARD|G_VOID);
 
   FREETMPS;
   LEAVE;
@@ -757,7 +757,7 @@ defaulthandle(void *userData, const char *string, int len)
   PUSHs(cbv->self_sv);
   PUSHs(sv_2mortal(newUTF8SVpvn((char*)string, len)));
   PUTBACK;
-  perl_call_sv(handler, G_DISCARD);
+  perl_call_sv(handler, G_DISCARD|G_VOID);
 
   FREETMPS;
   LEAVE;
@@ -784,7 +784,7 @@ elementDecl(void *data,
   PUSHs(sv_2mortal(newUTF8SVpv((char *)name, 0)));
   PUSHs(sv_2mortal(cmod));
   PUTBACK;
-  perl_call_sv(cbv->eledcl_sv, G_DISCARD);
+  perl_call_sv(cbv->eledcl_sv, G_DISCARD|G_VOID);
   FREETMPS;
   LEAVE;
 
@@ -822,7 +822,7 @@ attributeDecl(void *data,
   if (dflt && reqorfix)
     XPUSHs(&PL_sv_yes);
   PUTBACK;
-  perl_call_sv(cbv->attdcl_sv, G_DISCARD);
+  perl_call_sv(cbv->attdcl_sv, G_DISCARD|G_VOID);
 
   FREETMPS;
   LEAVE;
@@ -855,7 +855,7 @@ entityDecl(void *data,
   if (isparam)
     XPUSHs(&PL_sv_yes);
   PUTBACK;
-  perl_call_sv(cbv->entdcl_sv, G_DISCARD);
+  perl_call_sv(cbv->entdcl_sv, G_DISCARD|G_VOID);
 
   FREETMPS;
   LEAVE;
@@ -881,7 +881,7 @@ doctypeStart(void *userData,
   PUSHs(pubid ? sv_2mortal(newUTF8SVpv((char*)pubid, 0)) : &PL_sv_undef);
   PUSHs(hasinternal ? &PL_sv_yes : &PL_sv_no);
   PUTBACK;
-  perl_call_sv(cbv->doctyp_sv, G_DISCARD);
+  perl_call_sv(cbv->doctyp_sv, G_DISCARD|G_VOID);
   FREETMPS;
   LEAVE;
 }  /* End doctypeStart */
@@ -898,7 +898,7 @@ doctypeEnd(void *userData) {
   EXTEND(sp, 1);
   PUSHs(cbv->self_sv);
   PUTBACK;
-  perl_call_sv(cbv->doctypfin_sv, G_DISCARD);
+  perl_call_sv(cbv->doctypfin_sv, G_DISCARD|G_VOID);
   FREETMPS;
   LEAVE;
 }  /* End doctypeEnd */
@@ -924,7 +924,7 @@ xmlDecl(void *userData,
   PUSHs(standalone == -1 ? &PL_sv_undef
 	: (standalone ? &PL_sv_yes : &PL_sv_no));
   PUTBACK;
-  perl_call_sv(cbv->xmldec_sv, G_DISCARD);
+  perl_call_sv(cbv->xmldec_sv, G_DISCARD|G_VOID);
   FREETMPS;
   LEAVE;
 }  /* End xmlDecl */
@@ -952,7 +952,7 @@ unparsedEntityDecl(void *userData,
   PUSHs(pubid ? sv_2mortal(newUTF8SVpv((char*) pubid, 0)) : &PL_sv_undef);
   PUSHs(sv_2mortal(newUTF8SVpv((char*) notation, 0)));
   PUTBACK;
-  perl_call_sv(cbv->unprsd_sv, G_DISCARD);
+  perl_call_sv(cbv->unprsd_sv, G_DISCARD|G_VOID);
 
   FREETMPS;
   LEAVE;
@@ -993,7 +993,7 @@ notationDecl(void *userData,
     XPUSHs(sv_2mortal(newUTF8SVpv((char *) pubid, 0)));
 
   PUTBACK;
-  perl_call_sv(cbv->notation_sv, G_DISCARD);
+  perl_call_sv(cbv->notation_sv, G_DISCARD|G_VOID);
 }  /* End notationDecl */
 
 static int
@@ -1100,7 +1100,7 @@ externalEntityRef(XML_Parser parser,
 	  PUSHMARK(sp);
 	  PUSHs(cbv->self_sv);
 	  PUTBACK;
-	  perl_call_sv(cbv->extfin_sv, G_DISCARD);
+	  perl_call_sv(cbv->extfin_sv, G_DISCARD|G_VOID);
 	  SPAGAIN;
 	}
 
@@ -1203,7 +1203,7 @@ unknownEncoding(void *unused, const char *name, XML_Encoding *info)
     PUSHMARK(sp);
     XPUSHs(sv_2mortal(newSVpvn(buff,namelen)));
     PUTBACK;
-    perl_call_pv("XML::Parser::Expat::load_encoding", G_DISCARD);
+    perl_call_pv("XML::Parser::Expat::load_encoding", G_DISCARD|G_VOID);
     
     encinfptr = hv_fetch(EncodingTable, buff, namelen, 0);
     FREETMPS;
