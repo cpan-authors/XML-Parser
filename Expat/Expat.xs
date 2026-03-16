@@ -1026,7 +1026,7 @@ externalEntityRef(XML_Parser parser,
   EXTEND(sp, pubid ? 4 : 3);
   PUSHs(cbv->self_sv);
   PUSHs(base ? sv_2mortal(newUTF8SVpv((char*) base, 0)) : &PL_sv_undef);
-  PUSHs(sv_2mortal(newSVpv((char*) sysid, 0)));
+  PUSHs(sysid ? sv_2mortal(newSVpv((char*) sysid, 0)) : &PL_sv_undef);
   if (pubid)
     PUSHs(sv_2mortal(newUTF8SVpv((char*) pubid, 0)));
   PUTBACK ;
@@ -1386,6 +1386,12 @@ XML_ParserCreate(self_sv, enc_sv, namespaces)
 	     silently treated as empty in externalEntityRef(). */
 	  XML_SetParamEntityParsing(RETVAL,
 	    XML_PARAM_ENTITY_PARSING_UNLESS_STANDALONE);
+
+	  spp = hv_fetch((HV*)SvRV(cbv->self_sv), "UseForeignDTD",
+			 13, FALSE);
+
+	  if (spp && SvTRUE(*spp))
+	    XML_UseForeignDTD(RETVAL, XML_TRUE);
 	}
     OUTPUT:
 	RETVAL
