@@ -131,7 +131,7 @@ jobs:
       - name: perl -V
         run: perl -V
       - name: Makefile.PL
-        run: perl Makefile.PL EXPATLIBPATH="C:\strawberry\c\lib" EXPATINCPATH="C:\strawberry\c\include"
+        run: perl Makefile.PL INC="-IC:\strawberry\c\include" LIBS="-LC:\strawberry\c\lib -lexpat"
       - name: make
         run: gmake
       - name: make test
