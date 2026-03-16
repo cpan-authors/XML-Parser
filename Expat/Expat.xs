@@ -978,6 +978,19 @@ externalEntityRef(XML_Parser parser,
 
   CallbackVector* cbv = (CallbackVector*) XML_GetUserData(parser);
 
+  /* For parameter entities and DTD (context is NULL per expat docs),
+     when the user did not explicitly request ParseParamEnt, silently
+     treat the PE as empty and let expat continue processing subsequent
+     DTD declarations normally.  See GH #53. */
+  if (open == NULL && !cbv->parseparam) {
+    XML_Parser entpar = XML_ExternalEntityParserCreate(parser, open, 0);
+    if (entpar) {
+      XML_Parse(entpar, "", 0, 1);
+      XML_ParserFree(entpar);
+    }
+    return 1;
+  }
+
   if (! cbv->extent_sv)
     return 0;
 
@@ -1281,7 +1294,6 @@ XML_ParserCreate(self_sv, enc_sv, namespaces)
     CODE:
 	{
 	  CallbackVector *cbv;
-	  enum XML_ParamEntityParsing pep = XML_PARAM_ENTITY_PARSING_NEVER;
 	  char *enc = (char *) (SvTRUE(enc_sv) ? SvPV_nolen(enc_sv) : 0);
 	  SV ** spp;
 
@@ -1333,16 +1345,21 @@ XML_ParserCreate(self_sv, enc_sv, namespaces)
 	  XML_SetUserData(RETVAL, (void *) cbv);
 	  XML_SetElementHandler(RETVAL, startElement, endElement);
 	  XML_SetUnknownEncodingHandler(RETVAL, unknownEncoding, 0);
+	  XML_SetExternalEntityRefHandler(RETVAL, externalEntityRef);
 
 	  spp = hv_fetch((HV*)SvRV(cbv->self_sv), "ParseParamEnt",
 			 13, FALSE);
 
-	  if (spp && SvTRUE(*spp)) {
-	    pep = XML_PARAM_ENTITY_PARSING_UNLESS_STANDALONE;
+	  if (spp && SvTRUE(*spp))
 	    cbv->parseparam = 1;
-	  }	
 
-	  XML_SetParamEntityParsing(RETVAL, pep);
+	  /* Always enable parameter entity parsing so that PE references
+	     in the internal DTD subset don't cause expat to stop calling
+	     specific declaration handlers (Attlist, Element, Entity, etc.).
+	     When ParseParamEnt is not explicitly set, unresolvable PEs are
+	     silently treated as empty in externalEntityRef(). */
+	  XML_SetParamEntityParsing(RETVAL,
+	    XML_PARAM_ENTITY_PARSING_UNLESS_STANDALONE);
 	}
     OUTPUT:
 	RETVAL
