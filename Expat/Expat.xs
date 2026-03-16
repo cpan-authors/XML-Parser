@@ -212,16 +212,26 @@ append_error(XML_Parser parser, char * err)
     if (! err)
       err = (char *) XML_ErrorString(XML_GetErrorCode(parser));
 
-    /* Cast through IV/UV to avoid truncation on 32-bit perls when
-       expat is built with XML_LARGE_SIZE (long long types).
-       See https://rt.cpan.org/Ticket/Display.html?id=92030
+    /* Avoid truncation on 32-bit perls when expat is built with
+       XML_LARGE_SIZE (long long types).  Use NV (double, 53-bit
+       integer precision) to preserve values up to ~9 PB.
+       See https://github.com/cpan-authors/XML-Parser/issues/36
        and https://github.com/cpan-authors/XML-Parser/issues/48 */
+#if (defined(XML_LARGE_SIZE) && IVSIZE < 8)
+    sv_catpvf(*errstr, "\n%s at line %.0" NVff ", column %.0" NVff ", byte %.0" NVff "%s",
+	      err,
+	      (NV)XML_GetCurrentLineNumber(parser),
+	      (NV)XML_GetCurrentColumnNumber(parser),
+	      (NV)XML_GetCurrentByteIndex(parser),
+	      dopos ? ":\n" : "");
+#else
     sv_catpvf(*errstr, "\n%s at line %" UVuf ", column %" UVuf ", byte %" IVdf "%s",
 	      err,
 	      (UV)XML_GetCurrentLineNumber(parser),
 	      (UV)XML_GetCurrentColumnNumber(parser),
 	      (IV)XML_GetCurrentByteIndex(parser),
 	      dopos ? ":\n" : "");
+#endif
 	      
     if (dopos)
       {
@@ -2012,14 +2022,38 @@ int
 XML_GetErrorCode(parser)
 	XML_Parser			parser
 
-int
+SV *
 XML_GetCurrentLineNumber(parser)
 	XML_Parser			parser
+    CODE:
+	{
+	    XML_Size line = XML_GetCurrentLineNumber(parser);
+#if (defined(XML_LARGE_SIZE) && UVSIZE < 8)
+	    /* XML_Size is unsigned long long but UV is 32-bit; use NV */
+	    RETVAL = newSVnv((NV)line);
+#else
+	    RETVAL = newSVuv((UV)line);
+#endif
+	}
+    OUTPUT:
+	RETVAL
 
 
-int
+SV *
 XML_GetCurrentColumnNumber(parser)
 	XML_Parser			parser
+    CODE:
+	{
+	    XML_Size col = XML_GetCurrentColumnNumber(parser);
+#if (defined(XML_LARGE_SIZE) && UVSIZE < 8)
+	    /* XML_Size is unsigned long long but UV is 32-bit; use NV */
+	    RETVAL = newSVnv((NV)col);
+#else
+	    RETVAL = newSVuv((UV)col);
+#endif
+	}
+    OUTPUT:
+	RETVAL
 
 SV *
 XML_GetCurrentByteIndex(parser)
