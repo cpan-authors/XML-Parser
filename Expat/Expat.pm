@@ -780,6 +780,15 @@ Unless standalone is set to "yes" in the XML declaration, setting this to
 a true value allows the external DTD to be read, and parameter entities
 to be parsed and expanded.
 
+=item * UseForeignDTD
+
+When set to a true value, this option tells expat to call the ExternEnt
+handler even for documents that do not have a DOCTYPE declaration. This
+allows the application to provide a DTD for validation and entity
+definitions. In this case, the ExternEnt handler will be called with
+both the system ID and public ID set to undef. This option should be
+used together with ParseParamEnt.
+
 =item * Base
 
 The base to use for relative pathnames or URLs. This can also be done by
