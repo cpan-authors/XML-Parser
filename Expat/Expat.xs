@@ -244,6 +244,12 @@ append_error(XML_Parser parser, char * err)
 	FREETMPS ;
 	LEAVE ;
       }
+
+    if (XML_GetErrorCode(parser) == XML_ERROR_INVALID_TOKEN) {
+      sv_catpv(*errstr,
+        "(Hint: \"not well-formed\" often indicates unescaped '<', '>' or '&'"
+        " in content — use &lt; &gt; or &amp; instead)\n");
+    }
   }
 }  /* End append_error */
 
