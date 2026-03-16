@@ -1983,6 +1983,10 @@ XML_GetCurrentByteIndex(parser)
 	XML_Parser			parser
 
 int
+XML_GetCurrentByteCount(parser)
+	XML_Parser			parser
+
+int
 XML_GetSpecifiedAttributeCount(parser)
 	XML_Parser			parser
 
