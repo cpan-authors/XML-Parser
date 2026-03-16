@@ -343,8 +343,8 @@ parse_stream(XML_Parser parser, SV * ioref)
   }
   else {
     tbuff = newSV(0);
-    tsiz = newSViv(BUFSIZE); /* in UTF-8 characters */
-    buffsize = BUFSIZE * 6; /* in bytes that encode an UTF-8 string */
+    tsiz = newSViv(BUFSIZE);
+    buffsize = BUFSIZE;
   }
 
   while (! done)
@@ -387,8 +387,15 @@ parse_stream(XML_Parser parser, SV * ioref)
 
 	tb = SvPV(tbuff, br);
 	if (br > 0) {
-	  if (br > buffsize)
-	    croak("The input buffer is not large enough for read UTF-8 decoded string");
+	  if (br > buffsize) {
+	    /* The byte count from SvPV can exceed buffsize when the
+	       filehandle has a :utf8 layer, since Perl reads buffsize
+	       characters but multi-byte UTF-8 chars produce more bytes.
+	       Re-obtain the buffer at the required size. */
+	    buffer = XML_GetBuffer(parser, br);
+	    if (! buffer)
+	      croak("Ran out of memory for input buffer");
+	  }
 	  Copy(tb, buffer, br, char);
 	} else
 	  done = 1;
