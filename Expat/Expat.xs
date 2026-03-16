@@ -2265,6 +2265,11 @@ XML_Do_External_Parse(parser, result)
 	  if (SvROK(result) && SvOBJECT(SvRV(result))) {
 	    RETVAL = parse_stream(parser, result);
 	  }
+	  else if (SvROK(result) && isGV(SvRV(result))) {
+	    /* Lexical filehandle (open my $fh) - a reference to a glob */
+	    RETVAL = parse_stream(parser,
+				  sv_2mortal(newRV((SV*) GvIOp((GV*)SvRV(result)))));
+	  }
 	  else if (isGV(result)) {
 	    RETVAL = parse_stream(parser,
 				  sv_2mortal(newRV((SV*) GvIOp(result))));
