@@ -454,7 +454,10 @@ sub parse {
 
     if ( defined $arg ) {
         if ( ref($arg) eq 'SCALAR' ) {
-            $arg = $$arg;
+            $result = ParseString( $parser, $$arg );
+            $self->{_State_} = 2;
+            $result or croak $self->{ErrorMessage};
+            return $result;
         }
         local *@;
         if ( ref($arg) and UNIVERSAL::isa( $arg, 'IO::Handle' ) ) {
