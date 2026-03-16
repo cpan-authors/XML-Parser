@@ -11,6 +11,21 @@
 
 #include <expat.h>
 
+/* Compute a combined expat version number for feature detection */
+#define EXPAT_VER_NUM(major, minor, micro) \
+  ((major) * 10000 + (minor) * 100 + (micro))
+#define EXPAT_VERSION_NUM \
+  EXPAT_VER_NUM(XML_MAJOR_VERSION, XML_MINOR_VERSION, XML_MICRO_VERSION)
+
+/* BillionLaughs API: expat >= 2.4.0 */
+#define HAVE_BILLION_LAUGHS_API (EXPAT_VERSION_NUM >= EXPAT_VER_NUM(2,4,0))
+
+/* Reparse deferral API: expat >= 2.6.0 */
+#define HAVE_REPARSE_DEFERRAL_API (EXPAT_VERSION_NUM >= EXPAT_VER_NUM(2,6,0))
+
+/* AllocTracker API: expat >= 2.7.2 */
+#define HAVE_ALLOC_TRACKER_API (EXPAT_VERSION_NUM >= EXPAT_VER_NUM(2,7,2))
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -2319,4 +2334,96 @@ XML_Do_External_Parse(parser, result)
     OUTPUT:
         RETVAL
 
+int
+XML_HaveBillionLaughsApi()
+    CODE:
+#if HAVE_BILLION_LAUGHS_API
+	RETVAL = 1;
+#else
+	RETVAL = 0;
+#endif
+    OUTPUT:
+	RETVAL
 
+int
+XML_HaveReparseDeferralApi()
+    CODE:
+#if HAVE_REPARSE_DEFERRAL_API
+	RETVAL = 1;
+#else
+	RETVAL = 0;
+#endif
+    OUTPUT:
+	RETVAL
+
+int
+XML_HaveAllocTrackerApi()
+    CODE:
+#if HAVE_ALLOC_TRACKER_API
+	RETVAL = 1;
+#else
+	RETVAL = 0;
+#endif
+    OUTPUT:
+	RETVAL
+
+#if HAVE_BILLION_LAUGHS_API
+
+int
+XML_SetBillionLaughsAttackProtectionMaximumAmplification(parser, max_amp)
+	XML_Parser		parser
+	float			max_amp
+    CODE:
+	RETVAL = XML_SetBillionLaughsAttackProtectionMaximumAmplification(
+	    parser, max_amp);
+    OUTPUT:
+	RETVAL
+
+int
+XML_SetBillionLaughsAttackProtectionActivationThreshold(parser, threshold)
+	XML_Parser		parser
+	UV			threshold
+    CODE:
+	RETVAL = XML_SetBillionLaughsAttackProtectionActivationThreshold(
+	    parser, (unsigned long long) threshold);
+    OUTPUT:
+	RETVAL
+
+#endif
+
+#if HAVE_REPARSE_DEFERRAL_API
+
+int
+XML_SetReparseDeferralEnabled(parser, enabled)
+	XML_Parser		parser
+	int			enabled
+    CODE:
+	RETVAL = XML_SetReparseDeferralEnabled(parser, enabled);
+    OUTPUT:
+	RETVAL
+
+#endif
+
+#if HAVE_ALLOC_TRACKER_API
+
+int
+XML_SetAllocTrackerMaximumAmplification(parser, max_amp)
+	XML_Parser		parser
+	float			max_amp
+    CODE:
+	RETVAL = XML_SetAllocTrackerMaximumAmplification(
+	    parser, max_amp);
+    OUTPUT:
+	RETVAL
+
+int
+XML_SetAllocTrackerActivationThreshold(parser, threshold)
+	XML_Parser		parser
+	UV			threshold
+    CODE:
+	RETVAL = XML_SetAllocTrackerActivationThreshold(
+	    parser, (unsigned long long) threshold);
+    OUTPUT:
+	RETVAL
+
+#endif

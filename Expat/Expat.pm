@@ -251,6 +251,48 @@ sub element_index {
 }
 
 ################
+# Security API methods
+
+sub set_billion_laughs_attack_protection_maximum_amplification {
+    my ( $self, $max_amp ) = @_;
+    croak("BillionLaughs API not available (requires expat >= 2.4.0)")
+      unless HaveBillionLaughsApi();
+    return SetBillionLaughsAttackProtectionMaximumAmplification(
+        $self->{Parser}, $max_amp );
+}
+
+sub set_billion_laughs_attack_protection_activation_threshold {
+    my ( $self, $threshold ) = @_;
+    croak("BillionLaughs API not available (requires expat >= 2.4.0)")
+      unless HaveBillionLaughsApi();
+    return SetBillionLaughsAttackProtectionActivationThreshold(
+        $self->{Parser}, $threshold );
+}
+
+sub set_reparse_deferral_enabled {
+    my ( $self, $enabled ) = @_;
+    croak("ReparseDeferral API not available (requires expat >= 2.6.0)")
+      unless HaveReparseDeferralApi();
+    return SetReparseDeferralEnabled( $self->{Parser}, $enabled );
+}
+
+sub set_alloc_tracker_maximum_amplification {
+    my ( $self, $max_amp ) = @_;
+    croak("AllocTracker API not available (requires expat >= 2.7.2)")
+      unless HaveAllocTrackerApi();
+    return SetAllocTrackerMaximumAmplification(
+        $self->{Parser}, $max_amp );
+}
+
+sub set_alloc_tracker_activation_threshold {
+    my ( $self, $threshold ) = @_;
+    croak("AllocTracker API not available (requires expat >= 2.7.2)")
+      unless HaveAllocTrackerApi();
+    return SetAllocTrackerActivationThreshold(
+        $self->{Parser}, $threshold );
+}
+
+################
 # Namespace methods
 
 sub namespace {
