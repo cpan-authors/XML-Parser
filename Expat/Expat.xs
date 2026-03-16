@@ -514,7 +514,7 @@ startElement(void *userData, const char *name, const char **atts)
     }
   }
 
-  if (cbv->st_serial_stackptr >= cbv->st_serial_stacksize) {
+  if (cbv->st_serial_stackptr + 1 >= cbv->st_serial_stacksize) {
     unsigned int newsize = cbv->st_serial_stacksize + 512;
 
     Renew(cbv->st_serial_stack, newsize, unsigned int);
