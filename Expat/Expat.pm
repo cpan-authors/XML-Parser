@@ -847,6 +847,38 @@ used together with ParseParamEnt.
 The base to use for relative pathnames or URLs. This can also be done by
 using the base method.
 
+=item * BillionLaughsAttackProtectionMaximumAmplification
+
+Sets the maximum amplification factor for the Billion Laughs attack
+protection. This limits how many times larger the output of entity
+expansion can be relative to the input. For example, a value of 100.0
+means the parser will abort if entity expansion would produce output more
+than 100 times the size of the input.
+
+Requires libexpat E<gt>= 2.4.0 built with C<XML_DTD>.  Will C<croak> at
+runtime if the underlying C function is not available.
+
+=item * BillionLaughsAttackProtectionActivationThreshold
+
+Sets the activation threshold (in bytes) for the Billion Laughs attack
+protection. The amplification limit only kicks in after the parser has
+processed this many bytes of output from entity expansion. This prevents
+false positives on small documents that happen to have a high
+amplification ratio.
+
+Requires libexpat E<gt>= 2.4.0 built with C<XML_DTD>.  Will C<croak> at
+runtime if the underlying C function is not available.
+
+=item * ReparseDeferralEnabled
+
+When set to a true value, enables reparse deferral. When set to a false
+value (e.g. C<0>), disables it. Reparse deferral is a security mechanism
+in expat that defers reparsing of unfinished tokens until more input
+arrives, preventing certain XML-based attacks.
+
+Requires libexpat E<gt>= 2.6.0.  Will C<croak> at runtime if the
+underlying C function is not available.
+
 =back
 
 =item setHandlers(TYPE, HANDLER [, TYPE, HANDLER [...]])
@@ -1151,6 +1183,37 @@ that has an index number equal to INDEX is seen. If a start handler has
 been set, then this is the first tag that the start handler will see
 after skip_until has been called.
 
+
+=item billion_laughs_attack_protection_maximum_amplification(FACTOR)
+
+Sets the maximum amplification factor for the Billion Laughs attack
+protection.  FACTOR is a floating-point number (e.g. C<100.0>).
+
+  $parser->billion_laughs_attack_protection_maximum_amplification(100.0);
+
+Requires libexpat E<gt>= 2.4.0 built with C<XML_DTD>.  Will C<croak> if
+the underlying C API is not available.
+
+=item billion_laughs_attack_protection_activation_threshold(THRESHOLD)
+
+Sets the activation threshold (in bytes) for the Billion Laughs attack
+protection.  THRESHOLD is an unsigned integer.
+
+  $parser->billion_laughs_attack_protection_activation_threshold(1_000_000);
+
+Requires libexpat E<gt>= 2.4.0 built with C<XML_DTD>.  Will C<croak> if
+the underlying C API is not available.
+
+=item reparse_deferral_enabled(ENABLED)
+
+Enables or disables reparse deferral.  ENABLED is a boolean (true to
+enable, false to disable).
+
+  $parser->reparse_deferral_enabled(0);  # disable
+  $parser->reparse_deferral_enabled(1);  # enable
+
+Requires libexpat E<gt>= 2.6.0.  Will C<croak> if the underlying C API
+is not available.
 
 =item position_in_context(LINES)
 
