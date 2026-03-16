@@ -196,6 +196,13 @@ sub current_byte {
     }
 }
 
+sub current_length {
+    my $self = shift;
+    if ( $self->{_State_} == 1 ) {
+        return GetCurrentByteCount( $self->{Parser} );
+    }
+}
+
 sub base {
     my ( $self, $newbase ) = @_;
     my $p       = $self->{Parser};
@@ -1025,6 +1032,12 @@ Returns the column number of the current position of the parse.
 =item current_byte
 
 Returns the current position of the parse.
+
+=item current_length
+
+Returns the byte length of the current event. This is useful in conjunction
+with current_byte to determine the exact byte range of an event in the
+original XML document.
 
 =item base([NEWBASE]);
 
