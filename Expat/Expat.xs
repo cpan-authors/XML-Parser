@@ -212,14 +212,16 @@ append_error(XML_Parser parser, char * err)
     if (! err)
       err = (char *) XML_ErrorString(XML_GetErrorCode(parser));
 
-    sv_catpvf(*errstr, "\n%s at line %ld, column %ld, byte %ld%s",
+    /* Cast through IV/UV to avoid truncation on 32-bit perls when
+       expat is built with XML_LARGE_SIZE (long long types).
+       See https://rt.cpan.org/Ticket/Display.html?id=92030
+       and https://github.com/cpan-authors/XML-Parser/issues/48 */
+    sv_catpvf(*errstr, "\n%s at line %" UVuf ", column %" UVuf ", byte %" IVdf "%s",
 	      err,
-	      (long)XML_GetCurrentLineNumber(parser),
-	      (long)XML_GetCurrentColumnNumber(parser),
-	      (long)XML_GetCurrentByteIndex(parser),
+	      (UV)XML_GetCurrentLineNumber(parser),
+	      (UV)XML_GetCurrentColumnNumber(parser),
+	      (IV)XML_GetCurrentByteIndex(parser),
 	      dopos ? ":\n" : "");
-	      /* See https://rt.cpan.org/Ticket/Display.html?id=92030
-	         It explains why type conversion is used. */
 	      
     if (dopos)
       {
@@ -2002,9 +2004,21 @@ int
 XML_GetCurrentColumnNumber(parser)
 	XML_Parser			parser
 
-long
+SV *
 XML_GetCurrentByteIndex(parser)
 	XML_Parser			parser
+    CODE:
+	{
+	    XML_Index byte_index = XML_GetCurrentByteIndex(parser);
+#if (defined(XML_LARGE_SIZE) && IVSIZE < 8)
+	    /* XML_Index is long long but IV is 32-bit; use NV to avoid overflow */
+	    RETVAL = newSVnv((NV)byte_index);
+#else
+	    RETVAL = newSViv((IV)byte_index);
+#endif
+	}
+    OUTPUT:
+	RETVAL
 
 int
 XML_GetCurrentByteCount(parser)
