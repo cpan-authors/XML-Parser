@@ -453,6 +453,9 @@ sub parse {
     my $result = 0;
 
     if ( defined $arg ) {
+        if ( ref($arg) eq 'SCALAR' ) {
+            $arg = $$arg;
+        }
         local *@;
         if ( ref($arg) and UNIVERSAL::isa( $arg, 'IO::Handle' ) ) {
             $ioref = $arg;
