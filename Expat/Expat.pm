@@ -407,10 +407,10 @@ sub xml_escape {
             $text =~ s/>/\&gt;/g;
         }
         elsif ( $_ eq '"' ) {
-            $text =~ s/\"/\&quot;/;
+            $text =~ s/\"/\&quot;/g;
         }
         elsif ( $_ eq "'" ) {
-            $text =~ s/\'/\&apos;/;
+            $text =~ s/\'/\&apos;/g;
         }
         else {
             my $rep = '&#' . sprintf( 'x%X', ord($_) ) . ';';
