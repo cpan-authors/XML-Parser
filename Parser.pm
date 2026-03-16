@@ -496,6 +496,8 @@ A die call is thrown if a parse error occurs. Otherwise it will return 1
 or whatever is returned from the B<Final> handler, if one is installed.
 In other words, what parse may return depends on the style.
 
+See L<"ERROR HANDLING"> below for how to catch and handle parse errors.
+
 =item parsestring
 
 This is just an alias for parse for backwards compatibility.
@@ -503,7 +505,8 @@ This is just an alias for parse for backwards compatibility.
 =item parsefile(FILE [, OPT => OPT_VALUE [...]])
 
 Open FILE for reading, then call parse with the open handle. The file
-is closed no matter how parse returns. Returns what parse returns.
+is closed no matter how parse returns. A die call is thrown if the file
+cannot be opened or if a parse error occurs. Returns what parse returns.
 
 =item parse_start([ OPT => OPT_VALUE [...]])
 
@@ -818,6 +821,37 @@ finds, it loads.
 
 If you wish to build your own encoding maps, check out the XML::Encoding
 module from CPAN.
+
+=head1 ERROR HANDLING
+
+XML::Parser throws an exception (dies) when it encounters a parse error.
+This includes malformed XML, encoding errors, and other problems detected
+by the underlying expat library.
+
+The C<parse>, C<parsefile>, and C<parse_done> methods may all throw
+exceptions. To handle parse errors gracefully in your application, wrap
+the parse call in an C<eval> block:
+
+  my $parser = XML::Parser->new(Style => 'Tree');
+
+  my $tree = eval { $parser->parsefile('data.xml') };
+  if ($@) {
+    # Handle the parse error
+    warn "Parse failed: $@";
+  }
+
+The error message (in C<$@>) will include the line number, column number,
+and byte position where the error was detected. For additional context
+around the error location, set the B<ErrorContext> option when constructing
+the parser:
+
+  my $parser = XML::Parser->new(
+    Style        => 'Tree',
+    ErrorContext  => 2,
+  );
+
+This will include 2 lines of context on either side of the error in the
+error message.
 
 =head1 AUTHORS
 
