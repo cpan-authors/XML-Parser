@@ -1,5 +1,5 @@
 use Test;
-BEGIN { plan tests => 13 }
+BEGIN { plan tests => 14 }
 use XML::Parser;
 use IO::File;
 
@@ -43,8 +43,11 @@ my $xmlstr = '<foo>bar</foo>';
 
 {
     # Subs style
-    my $parser = XML::Parser->new( Style => 'Subs' );
+    sub MySubs::foo_ { die "unexpected\n"; }
+    my $parser = XML::Parser->new( Style => 'Subs', Pkg => 'MySubs' );
     ok($parser);
+    eval { $parser->parse($xmlstr); };
+    ok( $@ eq "unexpected\n" );
 }
 
 {
