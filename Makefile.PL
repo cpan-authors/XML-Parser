@@ -18,8 +18,22 @@ foreach (@ARGV) {
         else {
             $expat_incpath = $2;
         }
-
-        #push(@replacement_args, "$1=$2");
+    }
+    elsif (/^LIBS=(.+)/) {
+        # Support standard EUMM LIBS option: extract -L paths for expat detection
+        my $libs_val = $1;
+        if ( !$expat_libpath && $libs_val =~ /-L(\S+)/ ) {
+            $expat_libpath = $1;
+        }
+        push( @replacement_args, $_ );
+    }
+    elsif (/^INC=(.+)/) {
+        # Support standard EUMM INC option: extract -I paths for expat detection
+        my $inc_val = $1;
+        if ( !$expat_incpath && $inc_val =~ /-I(\S+)/ ) {
+            $expat_incpath = $1;
+        }
+        push( @replacement_args, $_ );
     }
     else {
         push( @replacement_args, $_ );
@@ -47,13 +61,17 @@ Or you can download expat from:
 http://sourceforge.net/projects/expat/
 
 If expat is installed, but in a non-standard directory, then use the
-following options to Makefile.PL:
+standard ExtUtils::MakeMaker options to Makefile.PL:
 
-    EXPATLIBPATH=...  To set the directory in which to find libexpat
+    INC=-I/home/me/include    To set the directory in which to find expat.h
 
-    EXPATINCPATH=...  To set the directory in which to find expat.h
+    LIBS="-L/home/me/lib -lexpat"  To set the directory in which to find libexpat
 
 For example:
+
+    perl Makefile.PL INC=-I/home/me/include LIBS="-L/home/me/lib -lexpat"
+
+The legacy EXPATLIBPATH and EXPATINCPATH options are also supported:
 
     perl Makefile.PL EXPATLIBPATH=/home/me/lib EXPATINCPATH=/home/me/include
 
