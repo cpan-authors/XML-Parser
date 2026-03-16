@@ -1036,7 +1036,7 @@ externalEntityRef(XML_Parser parser,
   EXTEND(sp, pubid ? 4 : 3);
   PUSHs(cbv->self_sv);
   PUSHs(base ? sv_2mortal(newUTF8SVpv((char*) base, 0)) : &PL_sv_undef);
-  PUSHs(sysid ? sv_2mortal(newSVpv((char*) sysid, 0)) : &PL_sv_undef);
+  PUSHs(sysid ? sv_2mortal(newUTF8SVpv((char*) sysid, 0)) : &PL_sv_undef);
   if (pubid)
     PUSHs(sv_2mortal(newUTF8SVpv((char*) pubid, 0)));
   PUTBACK ;
