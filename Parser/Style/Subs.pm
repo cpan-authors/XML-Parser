@@ -3,22 +3,20 @@
 package XML::Parser::Style::Subs;
 
 sub Start {
-    no strict 'refs';
     my $expat = shift;
     my $tag   = shift;
-    my $sub   = $expat->{Pkg} . "::$tag";
-    if ( defined(&$sub) ) {
-        &$sub( $expat, $tag, @_ );
+    my $sub   = $expat->{Pkg}->can($tag);
+    if ($sub) {
+        $sub->( $expat, $tag, @_ );
     }
 }
 
 sub End {
-    no strict 'refs';
     my $expat = shift;
     my $tag   = shift;
-    my $sub   = $expat->{Pkg} . "::${tag}_";
-    if ( defined(&$sub) ) {
-        &$sub( $expat, $tag );
+    my $sub   = $expat->{Pkg}->can("${tag}_");
+    if ($sub) {
+        $sub->( $expat, $tag );
     }
 }
 
