@@ -7,7 +7,9 @@ sub Start {
     my $expat = shift;
     my $tag   = shift;
     my $sub   = $expat->{Pkg} . "::$tag";
-    eval { &$sub( $expat, $tag, @_ ) };
+    if ( defined(&$sub) ) {
+        &$sub( $expat, $tag, @_ );
+    }
 }
 
 sub End {
@@ -15,7 +17,9 @@ sub End {
     my $expat = shift;
     my $tag   = shift;
     my $sub   = $expat->{Pkg} . "::${tag}_";
-    eval { &$sub( $expat, $tag ) };
+    if ( defined(&$sub) ) {
+        &$sub( $expat, $tag );
+    }
 }
 
 1;
