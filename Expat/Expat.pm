@@ -12,19 +12,19 @@ our $VERSION = '2.47';
 our ( %Encoding_Table, @Encoding_Path, $have_File_Spec );
 
 use File::Spec ();
+use File::ShareDir ();
 
 %Encoding_Table = ();
-if ($have_File_Spec) {
-    @Encoding_Path = (
-        grep( -d $_,
-            map( File::Spec->catdir( $_, qw(XML Parser Encodings) ),
-                @INC ) ),
-        File::Spec->curdir
-    );
-}
-else {
-    @Encoding_Path = ( grep( -d $_, map( $_ . '/XML/Parser/Encodings', @INC ) ), '.' );
-}
+
+my $_share_dir;
+eval { $_share_dir = File::ShareDir::dist_dir('XML-Parser') };
+
+@Encoding_Path = (
+    ( defined $_share_dir && -d $_share_dir ? ($_share_dir) : () ),
+    grep( -d $_,
+        map( File::Spec->catdir( $_, qw(XML Parser Encodings) ), @INC ) ),
+    File::Spec->curdir
+);
 
 XSLoader::load( 'XML::Parser::Expat', $VERSION );
 
@@ -77,11 +77,7 @@ sub load_encoding {
     $file .= '.enc' unless $file =~ /\.enc$/;
     unless ( $file =~ m!^/! ) {
         foreach (@Encoding_Path) {
-            my $tmp = (
-                $have_File_Spec
-                ? File::Spec->catfile( $_, $file )
-                : "$_/$file"
-            );
+            my $tmp = File::Spec->catfile( $_, $file );
             if ( -e $tmp ) {
                 $file = $tmp;
                 last;
