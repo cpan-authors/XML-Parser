@@ -953,9 +953,9 @@ including any internal or external DTD declarations.
 
 This handler is called for XML declarations. Version is a string containing
 the version. Encoding is either undefined or contains an encoding string.
-Standalone is either undefined, or true or false. Undefined indicates
-that no standalone parameter was given in the XML declaration. True or
-false indicates "yes" or "no" respectively.
+Standalone is either undefined, or the string C<"yes"> or C<"no">.
+Undefined indicates that no standalone parameter was given in the XML
+declaration.
 
 =back
 

@@ -14,7 +14,7 @@ if ($@) {
     plan skip_all => "expat cannot process external DTD with parameter entities: $@";
 }
 
-plan tests => 40;
+plan tests => 46;
 ok("loaded");
 
 my $bigval = <<'End_of_bigval;';
@@ -186,4 +186,32 @@ $parser->setHandlers(
 
 $| = 1;
 $parser->parse($docstr);
+
+# Test XMLDecl standalone attribute values (GH#73)
+{
+    my @got;
+    my $xd_parser = XML::Parser->new(
+        Handlers => {
+            XMLDecl => sub { shift; @got = @_ },
+        }
+    );
+
+    # standalone="yes" should return "yes"
+    @got = ();
+    $xd_parser->parse(qq{<?xml version="1.0" standalone="yes"?>\n<r/>});
+    is($got[0], '1.0', 'XMLDecl standalone=yes: version');
+    is($got[2], 'yes', 'XMLDecl standalone=yes: standalone is "yes"');
+
+    # standalone="no" should return "no"
+    @got = ();
+    $xd_parser->parse(qq{<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n<r/>});
+    is($got[0], '1.0',   'XMLDecl standalone=no: version');
+    is($got[1], 'UTF-8', 'XMLDecl standalone=no: encoding');
+    is($got[2], 'no',    'XMLDecl standalone=no: standalone is "no"');
+
+    # no standalone attribute should return undef
+    @got = ();
+    $xd_parser->parse(qq{<?xml version="1.0"?>\n<r/>});
+    ok(!defined($got[2]), 'XMLDecl no standalone: standalone is undef');
+}
 
