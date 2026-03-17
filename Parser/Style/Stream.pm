@@ -143,8 +143,9 @@ XML::Parser::Style::Stream - Stream style for XML::Parser
       # do something with end tags
     }
     
-    sub Characters {
-      my ($e, $data) = @_;
+    sub Text {
+      my ($e) = @_;
+      # $_ contains accumulated text
       # do something with text nodes
     }
   }
