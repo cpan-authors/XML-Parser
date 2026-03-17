@@ -10,7 +10,7 @@ use XML::Parser;
 # without a DOCTYPE declaration via the ExternalEntityRef handler.
 
 # Verify expat can handle external DTD processing with parameter entities.
-my $probe = XML::Parser->new(ParseParamEnt => 1, ErrorContext => 2);
+my $probe = XML::Parser->new(ParseParamEnt => 1, NoLWP => 1, ErrorContext => 2);
 eval { $probe->parse("<?xml version=\"1.0\"?>\n<!DOCTYPE foo SYSTEM \"t/foo.dtd\" []>\n<foo/>\n") };
 if ($@) {
     plan skip_all => "expat cannot process external DTD with parameter entities: $@";
