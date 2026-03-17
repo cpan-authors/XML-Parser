@@ -178,6 +178,13 @@ WriteMakefile1(
             bugtracker => 'https://github.com/toddr/XML-Parser/issues',
             repository => 'http://github.com/toddr/XML-Parser',
         },
+        prereqs => {
+            runtime => {
+                recommends => {
+                    'LWP::UserAgent' => 0,
+                },
+            },
+        },
     },
     TEST_REQUIRES => {
         'Test::More' => 0,
@@ -195,7 +202,6 @@ WriteMakefile1(
     },
     PREREQ_PM => {
         'File::ShareDir' => 0,
-        'LWP::UserAgent' => 0,    #for tests
     },
     $^O =~ /win/i
     ? (
