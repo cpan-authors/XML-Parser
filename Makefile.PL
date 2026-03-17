@@ -2,6 +2,8 @@ use 5.004005;    #Devel::CheckLib
 use ExtUtils::MakeMaker;
 use lib './inc';
 use Devel::CheckLib;
+use File::ShareDir::Install;
+install_share dist => 'share';
 
 use Config;
 
@@ -102,6 +104,12 @@ sub MY::test {
     $ret;
 }
 
+sub MY::postamble {
+    my $self = shift;
+    my @ret  = File::ShareDir::Install::postamble($self);
+    return join "\n", @ret;
+}
+
 my @extras = ();
 
 push(
@@ -132,7 +140,12 @@ WriteMakefile1(
     DIR          => [qw(Expat)],
     dist         => { COMPRESS => 'gzip', SUFFIX => '.gz' },
     VERSION_FROM => 'Parser.pm',
-    PREREQ_PM    => {
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker'     => 0,
+        'File::ShareDir::Install' => '0.06',
+    },
+    PREREQ_PM => {
+        'File::ShareDir' => 0,
         'LWP::UserAgent' => 0,    #for tests
     },
     $^O =~ /win/i
