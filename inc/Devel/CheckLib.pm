@@ -19,7 +19,9 @@ require Exporter;
 # localising prevents the warningness leaking out of this module
 local $^W = 1;    # use warnings is a 5.6-ism
 
-_findcc(); # bomb out early if there's no compiler
+# _findcc() is called inside assert_lib() when actually needed.
+# Calling it here at load time produces a confusing "Compilation failed
+# in require" error that hides the real problem (GH#90).
 
 =head1 NAME
 
@@ -479,7 +481,7 @@ sub _findcc {
 	    return ([ $compiler, @cc[1 .. $#cc], @ccflags ], \@ldflags)
 	}
     }
-    die("Couldn't find your C compiler.\n");
+    die("Couldn't find your C compiler: tried '$Config{cc}' in PATH ($ENV{PATH}).\nCheck that your C compiler is installed and that \$Config{cc} ('$Config{cc}') is correct.\n");
 }
 
 sub check_compiler
