@@ -273,10 +273,12 @@ sub _compile_cmd {
     my @sys_cmd = @$cc;
     if ( $Config_cc eq 'cl' ) {                 # Microsoft compiler
 	# this is horribly sensitive to the order of arguments
+	(my $ofile = $exefile) =~ s/\Q$Config{_exe}\E$/$Config{_o}/;
 	push @sys_cmd,
 	    $cfile,
 	    (defined $lib ? "${lib}.lib" : ()),
 	    "/Fe$exefile",
+	    "/Fo$ofile",
 	    (map '/I'.$_, @$incpaths),
 	    "/link",
 	    @$ld,
