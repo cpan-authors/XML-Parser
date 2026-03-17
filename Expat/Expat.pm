@@ -514,7 +514,19 @@ sub parse {
             require IO::Handle;
             eval {
                 no strict 'refs';
-                $ioref = *{$arg}{IO} if defined *{$arg};
+                if ( ref $arg eq 'GLOB' ) {
+
+                    # Glob reference not recognized as IO::Handle
+                    $ioref = *{$arg}{IO};
+                }
+                elsif ( $arg =~ /\A[^\W\d]\w*(?:::\w+)*\z/
+                    && defined *{$arg} )
+                {
+                    # Bareword filehandle name — only look up if it could be
+                    # a valid Perl identifier, to prevent auto-vivification
+                    # of symbol table entries for XML strings. (GH#27)
+                    $ioref = *{$arg}{IO};
+                }
             };
             if ( ref($ioref) eq 'FileHandle' ) {
 

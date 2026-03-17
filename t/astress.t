@@ -261,7 +261,7 @@ if ( $count != 2 ) {
 }
 print "ok 26\n";
 
-if ( defined( *{$xmlstring} ) ) {
+if ( exists $::{$xmlstring} ) {
     print "not ";
 }
 print "ok 27\n";
