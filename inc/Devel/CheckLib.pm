@@ -315,7 +315,8 @@ sub _make_cfile {
 	warn "# Code:\n$c\n";
     }
     my ($ch, $cfile) = File::Temp::tempfile(
-	'assertlibXXXXXXXX', SUFFIX => '.c'
+	'assertlibXXXXXXXX', SUFFIX => '.c',
+	DIR => File::Spec->tmpdir()
     );
     print $ch $code;
     close $ch;
@@ -373,7 +374,7 @@ sub assert_lib {
     for my $header (@headers) {
         push @use_headers, $header;
         my ($cfile, $ofile) = _make_cfile(\@use_headers, '', $args{debug});
-        my $exefile = File::Temp::mktemp( 'assertlibXXXXXXXX' ) . $Config{_exe};
+        my $exefile = File::Temp::mktemp( File::Spec->catfile(File::Spec->tmpdir(), 'assertlibXXXXXXXX') ) . $Config{_exe};
         my @sys_cmd = _compile_cmd($Config{cc}, $cc, $cfile, $exefile, \@incpaths, $ld, $Config{libs});
         warn "# @sys_cmd\n" if $args{debug};
         my $rv = $args{debug} ? system(@sys_cmd) : _quiet_system(@sys_cmd);
@@ -386,7 +387,7 @@ sub assert_lib {
     my ($cfile, $ofile) = _make_cfile(\@use_headers, @args{qw(function debug)});
     for my $lib ( @libs ) {
         last if $Config{cc} eq 'CC/DECC';          # VMS
-        my $exefile = File::Temp::mktemp( 'assertlibXXXXXXXX' ) . $Config{_exe};
+        my $exefile = File::Temp::mktemp( File::Spec->catfile(File::Spec->tmpdir(), 'assertlibXXXXXXXX') ) . $Config{_exe};
         my @sys_cmd = _compile_cmd($Config{cc}, $cc, $cfile, $exefile, \@incpaths, $ld, $Config{libs}, $lib, \@libpaths);
         warn "# @sys_cmd\n" if $args{debug};
         local $ENV{LD_RUN_PATH} = join(":", grep $_, @libpaths, $ENV{LD_RUN_PATH}) unless $^O eq 'MSWin32' or $^O eq 'darwin';
