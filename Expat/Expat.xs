@@ -110,7 +110,7 @@ static HV* EncodingTable = NULL;
 
 static XML_Char nsdelim[] = {NSDELIM, '\0'};
 
-static char *QuantChar[] = {"", "?", "*", "+"};
+static const char *QuantChar[] = {"", "?", "*", "+"};
 
 /* Forward declarations */
 
@@ -130,7 +130,7 @@ static void resume_callbacks(CallbackVector *);
 static SV *
 newSVpvn(char *s, STRLEN len)
 {
-  register SV *sv;
+  SV *sv;
 
   sv = newSV(0);
   sv_setpvn(sv, s, len);
@@ -144,7 +144,7 @@ newSVpvn(char *s, STRLEN len)
 
 static SV *
 newUTF8SVpv(char *s, STRLEN len) {
-  register SV *sv;
+  SV *sv;
 
   sv = newSVpv(s, len);
   SvUTF8_on(sv);
@@ -153,7 +153,7 @@ newUTF8SVpv(char *s, STRLEN len) {
 
 static SV *
 newUTF8SVpvn(char *s, STRLEN len) {
-  register SV *sv;
+  SV *sv;
 
   sv = newSV(0);
   sv_setpvn(sv, s, len);
@@ -1061,7 +1061,7 @@ externalEntityRef(XML_Parser parser,
 
 	XML_SetBase(entpar, XML_GetBase(parser));
 
-	sv_setiv(*pval, (IV) entpar);
+	sv_setiv(*pval, PTR2IV(entpar));
 
 	cbv->p = entpar;
 
@@ -1093,7 +1093,7 @@ externalEntityRef(XML_Parser parser,
 
       Extparse_Cleanup:
 	cbv->p = parser;
-	sv_setiv(*pval, (IV) parser);
+	sv_setiv(*pval, PTR2IV(parser));
 	XML_ParserFree(entpar);
 	     
 	if (cbv->extfin_sv) {
@@ -1168,6 +1168,7 @@ static int
 unknownEncoding(void *unused, const char *name, XML_Encoding *info)
 {
   SV ** encinfptr;
+  PERL_UNUSED_VAR(unused);
   Encinfo *enc;
   int namelen;
   int i;
@@ -1216,7 +1217,7 @@ unknownEncoding(void *unused, const char *name, XML_Encoding *info)
   if (! sv_derived_from(*encinfptr, "XML::Parser::Encinfo"))
     croak("Entry in XML::Parser::Expat::Encoding_Table not an Encinfo object");
 
-  enc = (Encinfo *) SvIV((SV*)SvRV(*encinfptr));
+  enc = INT2PTR(Encinfo *, SvIV((SV*)SvRV(*encinfptr)));
   Copy(enc->firstmap, info->map, 256, int);
   info->release = NULL;
   if (enc->prefixes_size) {
@@ -1499,12 +1500,8 @@ XML_ParseString(parser, sv)
 	SV *				sv
     CODE:
         {
-	  CallbackVector * cbv;
 	  STRLEN len;
 	  char *s = SvPV(sv, len);
-
-          cbv = (CallbackVector *) XML_GetUserData(parser);
-	  
 
 	  RETVAL = XML_Parse(parser, s, len, 1);
 	  SPAGAIN; /* XML_Parse might have changed stack pointer */
@@ -1548,7 +1545,6 @@ XML_ParsePartial(parser, sv)
 	{
 	  STRLEN len;
 	  char *s = SvPV(sv, len);
-	  CallbackVector * cbv = (CallbackVector *) XML_GetUserData(parser);
 
 	  RETVAL = XML_Parse(parser, s, len, 0);
 	  if (! RETVAL)
@@ -1800,7 +1796,6 @@ XML_SetDoctypeHandler(parser, doctyp_sv)
 	  XML_StartDoctypeDeclHandler dtsthndlr =
 	    (XML_StartDoctypeDeclHandler) 0;
 	  CallbackVector * cbv = (CallbackVector*) XML_GetUserData(parser);
-	  int set = 0;
 
 	  XMLP_UPD(doctyp_sv);
 	  if (SvTRUE(doctyp_sv))
@@ -1980,8 +1975,6 @@ XML_DefaultCurrent(parser)
 	XML_Parser			parser
     CODE:
 	{
-	  CallbackVector * cbv = (CallbackVector *) XML_GetUserData(parser);
-
 	  XML_DefaultCurrent(parser);
 	}
 
@@ -2292,10 +2285,8 @@ XML_Do_External_Parse(parser, result)
 	SV *				result
     CODE:
 	{
-	  int type;
+	  RETVAL = 0;
 
-          CallbackVector * cbv = (CallbackVector *) XML_GetUserData(parser);
-	  
 	  if (SvROK(result) && SvOBJECT(SvRV(result))) {
 	    RETVAL = parse_stream(parser, result);
 	  }
@@ -2310,7 +2301,6 @@ XML_Do_External_Parse(parser, result)
 	  }
 	  else if (SvPOK(result)) {
 	    STRLEN  eslen;
-	    int pret;
 	    char *entstr = SvPV(result, eslen);
 
 	    RETVAL = XML_Parse(parser, entstr, eslen, 1);
