@@ -1,5 +1,51 @@
 Revision history for Perl extension XML::Parser.
 
+2.48 2026-03-16 (by Todd Rinaldo)
+    - GH#25 Fix Debug style output for non-ASCII/multibyte characters
+    - GH#27 Prevent symbol table auto-vivification in Expat::parse
+    - GH#28 Add tests for globref and lexical filehandle return values in ExternEnt handler
+    - GH#30 Set UTF-8 flag on sysid in ExternEnt handler and fix Debug style for non-ASCII chars
+    - GH#31 Add encoding tests for windows-1251, koi8-r, windows-1255, and ibm866
+    - GH#36 Prevent position overflow for large files in line/column/error paths
+    - GH#38 Add G_VOID flag to all void-context perl_call_sv/method/pv calls
+    - GH#39 Fix off-by-one heap buffer overflow in st_serial_stack growth check (CVE-2006-10003)
+    - GH#41 Fix xml_escape to escape all occurrences of quote characters
+    - GH#44 Fix lexical filehandle handling in ExternEnt handler return values
+    - GH#45 Clean up compiler warnings in Expat.xs
+    - GH#46 Add UseForeignDTD option for documents without DOCTYPE
+    - GH#47 Fix routing of character data after root element to Char handler
+    - GH#48 Fix current_byte overflow for large XML files on 32-bit perl
+    - GH#49 Add current_length method to XML::Parser::Expat
+    - GH#50 Propagate xpcroak errors in Subs style instead of swallowing them
+    - GH#51 Skip external DTD tests when expat lacks parameter entity support
+    - GH#53 Fix parameter entity references in internal DTD subset breaking handler dispatch
+    - GH#54 Add hint about unescaped characters for invalid token errors
+    - GH#55 Add ERROR HANDLING section and improve parse error documentation
+    - GH#56 Clarify Char handler splitting behavior with example and docs
+    - GH#64 Fix buffer overflow in parse_stream when filehandle has :utf8 layer (CVE-2006-10002)
+    - GH#65 Support standard LIBS and INC options in Makefile.PL; propagate to Expat/Makefile.PL
+    - GH#67 Add NoLWP to expat capability probes for consistent skip logic
+    - GH#69 Auto-detect multiarch library paths for expat
+    - GH#70 Enhance parse exceptions with XML context when ErrorContext is set
+    - GH#71 Move encoding maps from PERL5LIB to File::ShareDir
+    - GH#72 Localize $_ in Style::Stream to avoid read-only modification
+    - GH#73 XMLDecl handler now returns "yes"/"no" for standalone attribute
+    - GH#74 Document predefined entity expansion in Tree style
+    - GH#76 Use system tmpdir for temp files in Devel::CheckLib
+    - GH#83 Use pkg-config to auto-detect expat in non-standard locations
+    - GH#90 Improve "Couldn't find your C compiler" error message
+    - GH#100 Clean up MSVC assertlib .obj files on Windows
+    - GH#101 Make LWP::UserAgent a recommended dependency, not required
+    - GH#102 Expose expat security APIs: BillionLaughs and ReparseDeferral
+    - GH#103 Skip -rpath on Mac OS X 10.4 and earlier
+    - GH#106 Fix freeing of the content model using XML_FreeContentModel
+    - GH#148 XML-escape attribute values in Stream style default output
+    - GH#149 Restore Base after parsefile() to prevent context pollution on reuse
+    - GH#150 Replace Artistic-2.0 LICENSE with correct Perl dual license
+    - GH#151 Modernize xpcroak.t from Test.pm to Test::More
+    - GH#152 Fix SYNOPSIS handler name Characters -> Text in Stream.pm
+    - GH#153 Fix variable interpolation in xpcarp() and setHandlers() error messages
+
 2.47 2023-12-28 (by Todd Rinaldo)
     - #84 use $fh instead of $foo
 	- #85 Fix typo in documentation
