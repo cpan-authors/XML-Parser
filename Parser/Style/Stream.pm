@@ -25,7 +25,13 @@ sub Start {
 
     %_ = @_;
     while (@_) {
-        $_ .= ' ' . shift() . '="' . shift() . '"';
+        my $attr = shift;
+        my $val  = shift;
+        $val =~ s/&/&amp;/g;
+        $val =~ s/</&lt;/g;
+        $val =~ s/>/&gt;/g;
+        $val =~ s/"/&quot;/g;
+        $_ .= ' ' . $attr . '="' . $val . '"';
     }
     $_ .= '>';
 
