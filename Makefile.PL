@@ -44,6 +44,24 @@ foreach (@ARGV) {
 
 @ARGV = @replacement_args;
 
+# Auto-detect expat in multiarch library directories (GH#69)
+# On Debian/Ubuntu multiarch systems, libraries live in paths like
+# /usr/lib/x86_64-linux-gnu/ which aren't searched by default.
+if ( !$expat_libpath && $^O ne 'MSWin32' ) {
+    chomp( my $libdir = `pkg-config --variable=libdir expat 2>/dev/null` || '' );
+    if ( $libdir && -d $libdir ) {
+        $expat_libpath = $libdir;
+    }
+    elsif ( !$expat_libpath ) {
+        chomp( my $multiarch = `gcc -print-multiarch 2>/dev/null` || '' );
+        if ( $multiarch && -d "/usr/lib/$multiarch" ) {
+            $expat_libpath = "/usr/lib/$multiarch"
+              if -f "/usr/lib/$multiarch/libexpat.so"
+              || -f "/usr/lib/$multiarch/libexpat.a";
+        }
+    }
+}
+
 unless (
     check_lib(    # fill in what you prompted the user for here
         lib     => [qw(expat)],
