@@ -6,6 +6,7 @@ use File::ShareDir::Install;
 install_share dist => 'share';
 
 use Config;
+use File::Spec;
 
 $expat_libpath = $ENV{EXPATLIBPATH} || '';
 $expat_incpath = $ENV{EXPATINCPATH} || '';
@@ -44,23 +45,38 @@ foreach (@ARGV) {
 
 @ARGV = @replacement_args;
 
-# Auto-detect expat in multiarch library directories (GH#69)
-# On Debian/Ubuntu multiarch systems, libraries live in paths like
-# /usr/lib/x86_64-linux-gnu/ which aren't searched by default.
-# Try pkg-config first; if pkg-config is not installed or doesn't know
-# about expat, fall back to gcc -print-multiarch.  Both commands redirect
-# stderr to /dev/null so a missing tool is silently ignored.
-if ( !$expat_libpath && $^O ne 'MSWin32' ) {
-    chomp( my $libdir = `pkg-config --variable=libdir expat 2>/dev/null` || '' );
-    if ( $libdir && -d $libdir ) {
-        $expat_libpath = $libdir;
+# --- Try to auto-detect expat via pkg-config or multiarch (GH#83 & GH#69) ---
+if ( !$expat_libpath && !$expat_incpath ) {
+    my $pkg_config = $ENV{PKG_CONFIG} || 'pkg-config';
+    my $devnull    = File::Spec->devnull;
+
+    # 1. Try comprehensive pkg-config search for headers and libs
+    if ( my $pc_cflags = `$pkg_config --cflags expat 2>$devnull` ) {
+        $expat_incpath = $1 if $pc_cflags =~ /-I(\S+)/;
     }
-    else {
-        chomp( my $multiarch = `gcc -print-multiarch 2>/dev/null` || '' );
-        if ( $multiarch && -d "/usr/lib/$multiarch" ) {
-            $expat_libpath = "/usr/lib/$multiarch"
-              if -f "/usr/lib/$multiarch/libexpat.so"
-              || -f "/usr/lib/$multiarch/libexpat.a";
+
+    if ( my $pc_libs = `$pkg_config --libs expat 2>$devnull` ) {
+        $expat_libpath = $1 if $pc_libs =~ /-L(\S+)/;
+    }
+
+    # 2. Fallback: If libpath is still empty and not on Windows, try specialized paths
+    if ( !$expat_libpath && $^O ne 'MSWin32' ) {
+        # Check specific libdir variable from pkg-config
+        chomp( my $libdir = `$pkg_config --variable=libdir expat 2>$devnull` || '' );
+
+        if ( $libdir && -d $libdir ) {
+            $expat_libpath = $libdir;
+        }
+        else {
+            # Last resort: Debian/Ubuntu multiarch fallback
+            chomp( my $multiarch = `gcc -print-multiarch 2>$devnull` || '' );
+            my $multiarch_path = "/usr/lib/$multiarch";
+
+            if ( $multiarch && -d $multiarch_path ) {
+                if ( -f "$multiarch_path/libexpat.so" || -f "$multiarch_path/libexpat.a" ) {
+                    $expat_libpath = $multiarch_path;
+                }
+            }
         }
     }
 }
@@ -97,6 +113,12 @@ For example:
 The legacy EXPATLIBPATH and EXPATINCPATH options are also supported:
 
     perl Makefile.PL EXPATLIBPATH=/home/me/lib EXPATINCPATH=/home/me/include
+
+If expat is installed and pkg-config is available, you can also set:
+
+    export PKG_CONFIG_PATH=/path/to/expat/lib/pkgconfig
+
+and Makefile.PL will use pkg-config to find expat automatically.
 
 Note that if you build against a shareable library in a non-standard location
 you may (on some platforms) also have to set your LD_LIBRARY_PATH environment
