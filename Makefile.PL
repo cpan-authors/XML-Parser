@@ -114,6 +114,11 @@ if ( not $expat_libpath and $] >= 5.006001 and $^O ne 'MSWin32' ) {
     ($expat_libpath) = ExtUtils::Liblist->ext('-lexpat');
 }
 
+# Propagate resolved paths to Expat/Makefile.PL via environment
+# (subdirectory Makefile.PLs run as separate processes)
+$ENV{EXPATLIBPATH} = $expat_libpath if $expat_libpath;
+$ENV{EXPATINCPATH} = $expat_incpath if $expat_incpath;
+
 # Don't try to descend into Expat directory for testing
 
 sub MY::test {
