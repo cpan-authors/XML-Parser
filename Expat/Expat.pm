@@ -126,7 +126,7 @@ sub setHandlers {
     while (@handler_pairs) {
         my $type    = shift @handler_pairs;
         my $handler = shift @handler_pairs;
-        croak 'Handler for $type not a Code ref'
+        croak "Handler for $type not a Code ref"
           unless ( !defined($handler) or !$handler or ref($handler) eq 'CODE' );
 
         my $hndl = $self->{_Setters}->{$type};
@@ -159,7 +159,7 @@ sub xpcarp {
 
     my $eclines = $self->{ErrorContext};
     my $line    = GetCurrentLineNumber( $_[0]->{Parser} );
-    $message .= ' at line $line';
+    $message .= " at line $line";
     $message .= ":\n" . $self->position_in_context($eclines)
       if defined($eclines);
     carp $message;
