@@ -45,39 +45,38 @@ foreach (@ARGV) {
 
 @ARGV = @replacement_args;
 
-# Try pkg-config as a fallback when paths are not explicitly provided (GH#83)
+# --- Try to auto-detect expat via pkg-config or multiarch (GH#83 & GH#69) ---
 if ( !$expat_libpath && !$expat_incpath ) {
     my $pkg_config = $ENV{PKG_CONFIG} || 'pkg-config';
     my $devnull    = File::Spec->devnull;
-    if ( my $pc_cflags = `$pkg_config --cflags expat 2>$devnull` ) {
-        chomp $pc_cflags;
-        if ( $pc_cflags =~ /-I(\S+)/ ) {
-            $expat_incpath = $1;
-        }
-    }
-    if ( my $pc_libs = `$pkg_config --libs expat 2>$devnull` ) {
-        chomp $pc_libs;
-        if ( $pc_libs =~ /-L(\S+)/ ) {
-            $expat_libpath = $1;
-        }
-    }
-}
 
-# Auto-detect expat in multiarch library directories (GH#69)
-# On Debian/Ubuntu multiarch systems, libraries live in paths like
-# /usr/lib/x86_64-linux-gnu/ which aren't searched by default.
-# Try pkg-config libdir first; if that fails, fall back to gcc -print-multiarch.
-if ( !$expat_libpath && $^O ne 'MSWin32' ) {
-    chomp( my $libdir = `pkg-config --variable=libdir expat 2>/dev/null` || '' );
-    if ( $libdir && -d $libdir ) {
-        $expat_libpath = $libdir;
+    # 1. Try comprehensive pkg-config search for headers and libs
+    if ( my $pc_cflags = `$pkg_config --cflags expat 2>$devnull` ) {
+        $expat_incpath = $1 if $pc_cflags =~ /-I(\S+)/;
     }
-    else {
-        chomp( my $multiarch = `gcc -print-multiarch 2>/dev/null` || '' );
-        if ( $multiarch && -d "/usr/lib/$multiarch" ) {
-            $expat_libpath = "/usr/lib/$multiarch"
-              if -f "/usr/lib/$multiarch/libexpat.so"
-              || -f "/usr/lib/$multiarch/libexpat.a";
+
+    if ( my $pc_libs = `$pkg_config --libs expat 2>$devnull` ) {
+        $expat_libpath = $1 if $pc_libs =~ /-L(\S+)/;
+    }
+
+    # 2. Fallback: If libpath is still empty and not on Windows, try specialized paths
+    if ( !$expat_libpath && $^O ne 'MSWin32' ) {
+        # Check specific libdir variable from pkg-config
+        chomp( my $libdir = `$pkg_config --variable=libdir expat 2>$devnull` || '' );
+
+        if ( $libdir && -d $libdir ) {
+            $expat_libpath = $libdir;
+        }
+        else {
+            # Last resort: Debian/Ubuntu multiarch fallback
+            chomp( my $multiarch = `gcc -print-multiarch 2>$devnull` || '' );
+            my $multiarch_path = "/usr/lib/$multiarch";
+
+            if ( $multiarch && -d $multiarch_path ) {
+                if ( -f "$multiarch_path/libexpat.so" || -f "$multiarch_path/libexpat.a" ) {
+                    $expat_libpath = $multiarch_path;
+                }
+            }
         }
     }
 }
