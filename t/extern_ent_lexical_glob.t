@@ -6,9 +6,14 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More;
 use XML::Parser;
 use File::Temp qw(tempfile);
+
+if ($] < 5.012) {
+    plan skip_all => 'Lexical filehandles lack read() method before Perl 5.12';
+}
+plan tests => 2;
 
 # Create a temporary entity file
 my ($fh, $entfile) = tempfile(UNLINK => 1, SUFFIX => '.ent');
