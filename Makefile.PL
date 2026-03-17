@@ -6,6 +6,7 @@ use File::ShareDir::Install;
 install_share dist => 'share';
 
 use Config;
+use File::Spec;
 
 $expat_libpath = $ENV{EXPATLIBPATH} || '';
 $expat_incpath = $ENV{EXPATINCPATH} || '';
@@ -44,12 +45,28 @@ foreach (@ARGV) {
 
 @ARGV = @replacement_args;
 
+# Try pkg-config as a fallback when paths are not explicitly provided (GH#83)
+if ( !$expat_libpath && !$expat_incpath ) {
+    my $pkg_config = $ENV{PKG_CONFIG} || 'pkg-config';
+    my $devnull    = File::Spec->devnull;
+    if ( my $pc_cflags = `$pkg_config --cflags expat 2>$devnull` ) {
+        chomp $pc_cflags;
+        if ( $pc_cflags =~ /-I(\S+)/ ) {
+            $expat_incpath = $1;
+        }
+    }
+    if ( my $pc_libs = `$pkg_config --libs expat 2>$devnull` ) {
+        chomp $pc_libs;
+        if ( $pc_libs =~ /-L(\S+)/ ) {
+            $expat_libpath = $1;
+        }
+    }
+}
+
 # Auto-detect expat in multiarch library directories (GH#69)
 # On Debian/Ubuntu multiarch systems, libraries live in paths like
 # /usr/lib/x86_64-linux-gnu/ which aren't searched by default.
-# Try pkg-config first; if pkg-config is not installed or doesn't know
-# about expat, fall back to gcc -print-multiarch.  Both commands redirect
-# stderr to /dev/null so a missing tool is silently ignored.
+# Try pkg-config libdir first; if that fails, fall back to gcc -print-multiarch.
 if ( !$expat_libpath && $^O ne 'MSWin32' ) {
     chomp( my $libdir = `pkg-config --variable=libdir expat 2>/dev/null` || '' );
     if ( $libdir && -d $libdir ) {
@@ -97,6 +114,12 @@ For example:
 The legacy EXPATLIBPATH and EXPATINCPATH options are also supported:
 
     perl Makefile.PL EXPATLIBPATH=/home/me/lib EXPATINCPATH=/home/me/include
+
+If expat is installed and pkg-config is available, you can also set:
+
+    export PKG_CONFIG_PATH=/path/to/expat/lib/pkgconfig
+
+and Makefile.PL will use pkg-config to find expat automatically.
 
 Note that if you build against a shareable library in a non-standard location
 you may (on some platforms) also have to set your LD_LIBRARY_PATH environment
