@@ -44,7 +44,7 @@ $parser->parse($xml);
 if (defined $start_length && $start_length > 0) {
     print "ok 2\n";
 } else {
-    print "not ok 2 # start_length=" . ($start_length // 'undef') . "\n";
+    print "not ok 2 # start_length=" . (defined $start_length ? $start_length : 'undef') . "\n";
 }
 
 # Test 3: start tag <child attr="val"> should have correct length
@@ -52,19 +52,19 @@ if (defined $start_length && $start_length > 0) {
 if ($start_length == 18) {
     print "ok 3\n";
 } else {
-    print "not ok 3 # expected 18, got " . ($start_length // 'undef') . "\n";
+    print "not ok 3 # expected 18, got " . (defined $start_length ? $start_length : 'undef') . "\n";
 }
 
 # Test 4: end tag </child> should have correct length (8 bytes)
 if ($end_length == 8) {
     print "ok 4\n";
 } else {
-    print "not ok 4 # expected 8, got " . ($end_length // 'undef') . "\n";
+    print "not ok 4 # expected 8, got " . (defined $end_length ? $end_length : 'undef') . "\n";
 }
 
 # Test 5: character data "text" should have correct length (4 bytes)
 if ($char_length == 4) {
     print "ok 5\n";
 } else {
-    print "not ok 5 # expected 4, got " . ($char_length // 'undef') . "\n";
+    print "not ok 5 # expected 4, got " . (defined $char_length ? $char_length : 'undef') . "\n";
 }
