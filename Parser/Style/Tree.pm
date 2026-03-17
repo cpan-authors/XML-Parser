@@ -89,4 +89,17 @@ The root document "foo", has 3 children: a "head" element, a "bar"
 element and the text "do". After the empty attribute hash, these are
 represented in it's contents by 3 tag-content pairs.
 
+=head2 Entity Expansion
+
+The underlying Expat parser always expands predefined XML entity
+references (C<&lt;>, C<&gt;>, C<&amp;>, C<&quot;>, C<&apos;>) in both
+text content and attribute values before they reach the Tree style
+handlers. This is required by the XML specification and cannot be
+prevented. For example, C<&lt;> in the source XML will appear as C<< < >>
+in the resulting tree structure.
+
+If you need access to the original unexpanded text, consider using the
+handler-based API with the C<original_string> method on the Expat object
+instead of the Tree style.
+
 =cut
