@@ -560,6 +560,20 @@ characters may generate multiple calls to this handler. Whatever the
 encoding of the string in the original document, this is given to the
 handler in UTF-8.
 
+B<Important:> Because the underlying expat library parses in fixed-size
+chunks, character data that spans a buffer boundary will arrive as two or
+more consecutive Char events. This typically occurs with files larger than
+about 32 KiB and is not a bug. To obtain the complete text of an element,
+accumulate the strings delivered between Start and End events:
+
+  my $current_text;
+  sub start_handler { $current_text = ''; }
+  sub char_handler  { $current_text .= $_[1]; }
+  sub end_handler   { print "complete text: $current_text\n"; }
+
+The Stream style (C<< XML::Parser::Style::Stream >>) already performs this
+accumulation automatically.
+
 =head2 Proc                (Expat, Target, Data)
 
 This event is generated when a processing instruction is recognized.
