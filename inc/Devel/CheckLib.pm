@@ -268,6 +268,19 @@ sub _parsewords {
     map { my $s=$_; $s =~ s/^"(.*)"$/$1/; $s } grep defined && length, quotewords '\s+', 1, @_;
 }
 
+sub _darwin_supports_rpath {
+    return 0 unless $^O eq 'darwin';
+    # -rpath requires Mac OS X 10.5 (Darwin 9) or later.
+    # Check MACOSX_DEPLOYMENT_TARGET first (may target older OS),
+    # then fall back to the system's Darwin kernel version.
+    my $target = $ENV{MACOSX_DEPLOYMENT_TARGET};
+    if (defined $target && $target =~ /^(\d+)\.(\d+)/) {
+        return ($1 > 10 || ($1 == 10 && $2 >= 5));
+    }
+    my ($darwin_major) = ($Config{osvers} || '') =~ /^(\d+)/;
+    return ($darwin_major || 0) >= 9; # Darwin 9 = Mac OS X 10.5
+}
+
 sub _compile_cmd {
     my ($Config_cc, $cc, $cfile, $exefile, $incpaths, $ld, $Config_libs, $lib, $libpaths) = @_;
     my @sys_cmd = @$cc;
@@ -299,7 +312,7 @@ sub _compile_cmd {
 	    $cfile,
 	    (!defined $lib ? () : (
 	      (map "-L$_", @$libpaths),
-	      ($^O eq 'darwin' ? (map { "-Wl,-rpath,$_" } @$libpaths) : ()),
+	      (_darwin_supports_rpath() ? (map { "-Wl,-rpath,$_" } @$libpaths) : ()),
 	      "-l$lib",
 	    )),
 	    @$ld,
