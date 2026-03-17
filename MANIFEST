@@ -51,6 +51,7 @@ samples/xmlfilter		A utility to filter elements
 samples/xmlstats		A utility to report on element statistics
 t/astress.t			Test script
 t/cdata.t			Test script
+t/combine_chars.t		Test script
 t/current_length.t		Test script
 t/decl.t			Test script
 t/defaulted.t			Test script
