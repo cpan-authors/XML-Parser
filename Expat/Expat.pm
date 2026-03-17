@@ -484,13 +484,21 @@ sub parse {
         $prev_rs = $ioclass->input_record_separator("\n$delim\n")
           if defined($delim);
 
-        $result = ParseStream( $parser, $ioref, $delim );
+        eval { $result = ParseStream( $parser, $ioref, $delim ) };
 
         $ioclass->input_record_separator($prev_rs)
           if defined($delim);
     }
     else {
-        $result = ParseString( $parser, $arg );
+        eval { $result = ParseString( $parser, $arg ) };
+    }
+
+    if ($@) {
+        # Preserve reference exceptions (e.g. objects thrown by handlers)
+        die $@ if ref $@;
+        # For string exceptions, add XML context when ErrorContext is set
+        $self->xpcroak($@) if defined $self->{ErrorContext};
+        die $@;
     }
 
     $self->{_State_} = 2;
