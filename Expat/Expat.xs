@@ -922,7 +922,7 @@ xmlDecl(void *userData,
   PUSHs(encoding ? sv_2mortal(newUTF8SVpv((char *)encoding, 0))
 	: &PL_sv_undef);
   PUSHs(standalone == -1 ? &PL_sv_undef
-	: (standalone ? &PL_sv_yes : &PL_sv_no));
+	: sv_2mortal(standalone ? newSVpvn("yes", 3) : newSVpvn("no", 2)));
   PUTBACK;
   perl_call_sv(cbv->xmldec_sv, G_DISCARD|G_VOID);
   FREETMPS;
