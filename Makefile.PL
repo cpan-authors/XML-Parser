@@ -130,6 +130,7 @@ WriteMakefile1(
 
     NAME         => 'XML::Parser',
     DIR          => [qw(Expat)],
+    clean        => { FILES => 'assertlib*' },
     dist         => { COMPRESS => 'gzip', SUFFIX => '.gz' },
     VERSION_FROM => 'Parser.pm',
     PREREQ_PM    => {
