@@ -220,6 +220,7 @@ sub parsefile {
     my @ret;
     my $ret;
 
+    my $old_base = $self->{Base};
     $self->{Base} = $file;
 
     if (wantarray) {
@@ -229,6 +230,7 @@ sub parsefile {
         eval { $ret = $self->parse( $fh, @_ ); };
     }
     my $err = $@;
+    $self->{Base} = $old_base;
     close($fh);
     die $err if $err;
 
