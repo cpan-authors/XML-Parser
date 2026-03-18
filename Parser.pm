@@ -244,9 +244,10 @@ sub initial_ext_ent_handler {
     # also loads the URI and LWP modules.
 
     unless ($LWP_load_failed) {
-        local ($^W) = 0;
-
-        my $stat = eval { require('XML/Parser/LWPExternEnt.pl'); };
+        my $stat = do {
+            no warnings;
+            eval { require('XML/Parser/LWPExternEnt.pl'); };
+        };
 
         if ($stat) {
             $_[0]->setHandlers(
