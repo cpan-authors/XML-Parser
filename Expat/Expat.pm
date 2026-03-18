@@ -408,7 +408,6 @@ sub xml_escape {
     my $self = shift;
     my $text = shift;
 
-    study $text;
     $text =~ s/\&/\&amp;/g;
     $text =~ s/</\&lt;/g;
     foreach (@_) {
