@@ -1337,6 +1337,7 @@ XML_ParserCreate(self_sv, enc_sv, namespaces)
 	  Newz(320, cbv, 1, CallbackVector);
 	  cbv->self_sv = SvREFCNT_inc(self_sv);
 	  Newz(325, cbv->st_serial_stack, 1024, unsigned int);
+	  cbv->st_serial_stacksize = 1024;
 	  spp = hv_fetch((HV*)SvRV(cbv->self_sv), "NoExpand", 8, 0);
 	  if (spp && SvTRUE(*spp))
 	    cbv->no_expand = 1;
