@@ -134,9 +134,8 @@ sub parse_start {
     my $self          = shift;
     my @expat_options = ();
 
-    my ( $key, $val );
-    while ( ( $key, $val ) = each %{$self} ) {
-        push( @expat_options, $key, $val )
+    for my $key ( keys %{$self} ) {
+        push( @expat_options, $key, $self->{$key} )
           unless exists $self->{Non_Expat_Options}->{$key};
     }
 
@@ -162,9 +161,8 @@ sub parse {
     my $self          = shift;
     my $arg           = shift;
     my @expat_options = ();
-    my ( $key, $val );
-    while ( ( $key, $val ) = each %{$self} ) {
-        push( @expat_options, $key, $val )
+    for my $key ( keys %{$self} ) {
+        push( @expat_options, $key, $self->{$key} )
           unless exists $self->{Non_Expat_Options}->{$key};
     }
 
