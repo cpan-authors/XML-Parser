@@ -175,8 +175,8 @@ WriteMakefile1(
     MIN_PERL_VERSION => '5.00405',
     META_MERGE       => {
         resources => {
-            bugtracker => 'https://github.com/toddr/XML-Parser/issues',
-            repository => 'http://github.com/toddr/XML-Parser',
+            bugtracker => 'https://github.com/cpan-authors/XML-Parser/issues',
+            repository => 'https://github.com/cpan-authors/XML-Parser',
         },
         prereqs => {
             runtime => {
