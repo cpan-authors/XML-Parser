@@ -2,7 +2,8 @@ package XML::Parser::Expat;
 
 use strict;
 
-#use warnings; No warnings numeric??
+# warnings not enabled globally: namespace methods use int() on strings
+# that may not be numeric and rely on 'no warnings "numeric"' locally.
 
 use XSLoader;
 use Carp;
@@ -266,14 +267,13 @@ sub element_index {
 
 sub namespace {
     my ( $self, $name ) = @_;
-    local ($^W) = 0;
+    no warnings 'numeric';
     $self->{Namespace_List}->[ int($name) ];
 }
 
 sub eq_name {
     my ( $self, $nm1, $nm2 ) = @_;
-    local ($^W) = 0;
-
+    no warnings 'numeric';
     int($nm1) == int($nm2) and $nm1 eq $nm2;
 }
 
