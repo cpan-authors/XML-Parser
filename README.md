@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/toddr/XML-Parser.png?branch=master)](https://travis-ci.org/toddr/XML-Parser)
+[![Build Status](https://github.com/cpan-authors/XML-Parser/actions/workflows/testsuite.yml/badge.svg)](https://github.com/cpan-authors/XML-Parser/actions/workflows/testsuite.yml)
 # NAME
 
 XML::Parser - A perl module for parsing XML documents
