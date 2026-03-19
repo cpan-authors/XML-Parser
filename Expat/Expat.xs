@@ -968,32 +968,21 @@ notationDecl(void *userData,
   dSP;
   CallbackVector* cbv = (CallbackVector*) userData;
 
+  ENTER;
+  SAVETMPS;
+
   PUSHMARK(sp);
-  XPUSHs(cbv->self_sv);
-  XPUSHs(sv_2mortal(newUTF8SVpv((char*) name, 0)));
-  if (base)
-    {
-      XPUSHs(sv_2mortal(newUTF8SVpv((char *) base, 0)));
-    }
-  else if (sysid || pubid)
-    {
-      XPUSHs(&PL_sv_undef);
-    }
-
-  if (sysid)
-    {
-      XPUSHs(sv_2mortal(newUTF8SVpv((char *) sysid, 0)));
-    }
-  else if (pubid)
-    {
-      XPUSHs(&PL_sv_undef);
-    }
-  
-  if (pubid)
-    XPUSHs(sv_2mortal(newUTF8SVpv((char *) pubid, 0)));
-
+  EXTEND(sp, 5);
+  PUSHs(cbv->self_sv);
+  PUSHs(sv_2mortal(newUTF8SVpv((char*) name, 0)));
+  PUSHs(base ? sv_2mortal(newUTF8SVpv((char *) base, 0)) : &PL_sv_undef);
+  PUSHs(sysid ? sv_2mortal(newUTF8SVpv((char *) sysid, 0)) : &PL_sv_undef);
+  PUSHs(pubid ? sv_2mortal(newUTF8SVpv((char *) pubid, 0)) : &PL_sv_undef);
   PUTBACK;
   perl_call_sv(cbv->notation_sv, G_DISCARD|G_VOID);
+
+  FREETMPS;
+  LEAVE;
 }  /* End notationDecl */
 
 static int
