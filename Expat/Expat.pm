@@ -512,6 +512,18 @@ sub reparse_deferral_enabled {
 }
 
 ################
+# Expat library version info
+
+sub expat_version {
+    return ExpatVersion();
+}
+
+sub expat_version_info {
+    my %info = ExpatVersionInfo();
+    return %info;
+}
+
+################
 
 sub release {
     my $self = shift;
@@ -1361,6 +1373,22 @@ method breaks those references (and makes the instance unusable.)
 
 Normally, higher level calls handle this for you, but if you are using
 XML::Parser::Expat directly, then it's your responsibility to call it.
+
+=item XML::Parser::Expat::expat_version
+
+Returns the version string of the linked expat library (e.g.
+C<"expat_2.5.0">).  This is a class method and can be called without
+a parser instance:
+
+  my $ver = XML::Parser::Expat::expat_version();
+
+=item XML::Parser::Expat::expat_version_info
+
+Returns a hash with the major, minor, and micro version numbers of the
+linked expat library:
+
+  my %v = XML::Parser::Expat::expat_version_info();
+  # %v = (major => 2, minor => 5, micro => 0)
 
 =back
 
