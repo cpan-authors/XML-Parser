@@ -6,8 +6,7 @@ on 'configure' => sub {
 };
 
 requires 'File::ShareDir' => 0;
-
-recommends 'LWP::UserAgent' => 0;
+requires 'LWP::UserAgent' => 0;
 
 on 'test' => sub {
     requires 'Test::More' => 0;
