@@ -79,6 +79,16 @@ sub new {
             $args{BillionLaughsAttackProtectionActivationThreshold}
         );
     }
+    if ( defined $args{AllocTrackerMaximumAmplification} ) {
+        $self->alloc_tracker_maximum_amplification(
+            $args{AllocTrackerMaximumAmplification}
+        );
+    }
+    if ( defined $args{AllocTrackerActivationThreshold} ) {
+        $self->alloc_tracker_activation_threshold(
+            $args{AllocTrackerActivationThreshold}
+        );
+    }
     if ( defined $args{ReparseDeferralEnabled} ) {
         $self->reparse_deferral_enabled( $args{ReparseDeferralEnabled} );
     }
@@ -466,6 +476,28 @@ sub billion_laughs_attack_protection_activation_threshold {
           . " (requires libexpat >= 2.4.0 built with XML_DTD)";
     }
     SetBillionLaughsAttackProtectionActivationThreshold( $self->{Parser}, $threshold );
+}
+
+sub alloc_tracker_maximum_amplification {
+    my ( $self, $factor ) = @_;
+    croak "Usage: \$parser->alloc_tracker_maximum_amplification(\$factor)"
+      unless defined $factor;
+    unless ( defined &SetAllocTrackerMaximumAmplification ) {
+        croak "SetAllocTrackerMaximumAmplification not available"
+          . " (requires libexpat >= 2.7.2)";
+    }
+    SetAllocTrackerMaximumAmplification( $self->{Parser}, $factor );
+}
+
+sub alloc_tracker_activation_threshold {
+    my ( $self, $threshold ) = @_;
+    croak "Usage: \$parser->alloc_tracker_activation_threshold(\$threshold)"
+      unless defined $threshold;
+    unless ( defined &SetAllocTrackerActivationThreshold ) {
+        croak "SetAllocTrackerActivationThreshold not available"
+          . " (requires libexpat >= 2.7.2)";
+    }
+    SetAllocTrackerActivationThreshold( $self->{Parser}, $threshold );
 }
 
 sub reparse_deferral_enabled {
@@ -884,6 +916,24 @@ amplification ratio.
 Requires libexpat E<gt>= 2.4.0 built with C<XML_DTD>.  Will C<croak> at
 runtime if the underlying C function is not available.
 
+=item * AllocTrackerMaximumAmplification
+
+Sets the maximum amplification factor for the allocation tracker.
+This limits how many times larger the output of entity expansion can be
+relative to the input.
+
+Requires libexpat E<gt>= 2.7.2.  Will C<croak> at runtime if the
+underlying C function is not available.
+
+=item * AllocTrackerActivationThreshold
+
+Sets the activation threshold (in bytes) for the allocation tracker.
+The amplification limit only kicks in after the parser has processed this
+many bytes of output from entity expansion.
+
+Requires libexpat E<gt>= 2.7.2.  Will C<croak> at runtime if the
+underlying C function is not available.
+
 =item * ReparseDeferralEnabled
 
 When set to a true value, enables reparse deferral. When set to a false
@@ -1218,6 +1268,26 @@ protection.  THRESHOLD is an unsigned integer.
 
 Requires libexpat E<gt>= 2.4.0 built with C<XML_DTD>.  Will C<croak> if
 the underlying C API is not available.
+
+=item alloc_tracker_maximum_amplification(FACTOR)
+
+Sets the maximum amplification factor for the allocation tracker.
+FACTOR is a floating-point number (e.g. C<100.0>).
+
+  $parser->alloc_tracker_maximum_amplification(100.0);
+
+Requires libexpat E<gt>= 2.7.2.  Will C<croak> if the underlying C API
+is not available.
+
+=item alloc_tracker_activation_threshold(THRESHOLD)
+
+Sets the activation threshold (in bytes) for the allocation tracker.
+THRESHOLD is an unsigned integer.
+
+  $parser->alloc_tracker_activation_threshold(1_000_000);
+
+Requires libexpat E<gt>= 2.7.2.  Will C<croak> if the underlying C API
+is not available.
 
 =item reparse_deferral_enabled(ENABLED)
 

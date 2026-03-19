@@ -2328,6 +2328,34 @@ XML_SetBillionLaughsAttackProtectionActivationThreshold(parser, threshold)
 #if defined(XML_MAJOR_VERSION) \
     && (XML_MAJOR_VERSION > 2 \
         || (XML_MAJOR_VERSION == 2 \
+            && (XML_MINOR_VERSION > 7 \
+                || (XML_MINOR_VERSION == 7 && XML_MICRO_VERSION >= 2))))
+
+int
+XML_SetAllocTrackerMaximumAmplification(parser, maxamp)
+	XML_Parser			parser
+	float				maxamp
+    CODE:
+	RETVAL = (int) XML_SetAllocTrackerMaximumAmplification(
+	    parser, maxamp);
+    OUTPUT:
+	RETVAL
+
+int
+XML_SetAllocTrackerActivationThreshold(parser, threshold)
+	XML_Parser			parser
+	unsigned long			threshold
+    CODE:
+	RETVAL = (int) XML_SetAllocTrackerActivationThreshold(
+	    parser, (unsigned long long) threshold);
+    OUTPUT:
+	RETVAL
+
+#endif
+
+#if defined(XML_MAJOR_VERSION) \
+    && (XML_MAJOR_VERSION > 2 \
+        || (XML_MAJOR_VERSION == 2 \
             && (XML_MINOR_VERSION > 6 \
                 || (XML_MINOR_VERSION == 6 && XML_MICRO_VERSION >= 0))))
 
