@@ -24,6 +24,7 @@ if (check_lib(
     lib      => [qw(expat)],
     header   => ['expat.h'],
     function => 'XML_SetAllocTrackerMaximumAmplification(NULL, 1.0); return 0;',
+    ccflags  => '-Werror=implicit-function-declaration',
     ($expat_incpath ? (incpath => $expat_incpath) : ()),
     ($expat_libpath ? (libpath => $expat_libpath) : ()),
 )) {
