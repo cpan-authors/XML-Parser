@@ -2343,11 +2343,7 @@ XML_SetBillionLaughsAttackProtectionActivationThreshold(parser, threshold)
 
 #endif
 
-#if defined(XML_MAJOR_VERSION) \
-    && (XML_MAJOR_VERSION > 2 \
-        || (XML_MAJOR_VERSION == 2 \
-            && (XML_MINOR_VERSION > 7 \
-                || (XML_MINOR_VERSION == 7 && XML_MICRO_VERSION >= 2))))
+#ifdef HAVE_XML_SETALLOCTRACKER
 
 int
 XML_SetAllocTrackerMaximumAmplification(parser, maxamp)
