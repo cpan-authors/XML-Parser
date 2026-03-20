@@ -320,8 +320,6 @@ parse_stream(XML_Parser parser, SV * ioref)
   int		ret = 1;
   char *	msg = NULL;
   CallbackVector * cbv;
-  char		*buff = (char *) 0;
-
   cbv = (CallbackVector*) XML_GetUserData(parser);
 
   ENTER;
@@ -511,11 +509,8 @@ startElement(void *userData, const char *name, const char **atts)
 {
   dSP;
   CallbackVector* cbv = (CallbackVector*) userData;
-  SV ** pcontext;
   unsigned   do_ns = cbv->ns;
   unsigned   skipping = 0;
-  SV ** pnstab;
-  SV ** pnslst;
   SV *  elname;
 
   cbv->st_serial++;
@@ -1071,7 +1066,7 @@ externalEntityRef(XML_Parser parser,
 	  char *hold;
 	  STRLEN   len;
 
-	  POPs;
+	  (void)POPs;
 	  hold = SvPV(ERRSV, len);
 	  New(326, errmsg, len + 1, char);
 	  if (len)
@@ -1190,7 +1185,6 @@ unknownEncoding(void *unused, const char *name, XML_Encoding *info)
   if (! encinfptr || ! SvOK(*encinfptr)) {
     /* Not found, so try to autoload */
     dSP;
-    int count;
 
     ENTER;
     SAVETMPS;
@@ -1513,7 +1507,6 @@ XML_ParseStream(parser, ioref, delim)
 	SV *				delim
     CODE:
 	{
-	  SV **delimsv;
 	  CallbackVector * cbv;
 
 	  cbv = (CallbackVector *) XML_GetUserData(parser);
@@ -1856,18 +1849,17 @@ XML_SetBase(parser, base)
 	}	
 
 
-SV *
+void
 XML_GetBase(parser)
 	XML_Parser			parser
-    CODE:
+    PPCODE:
 	{
 	  const char *ret = XML_GetBase(parser);
 	  if (ret) {
-	    ST(0) = sv_newmortal();
-	    sv_setpv(ST(0), ret);
+	    XPUSHs(sv_2mortal(newSVpv(ret, 0)));
 	  }
 	  else {
-	    ST(0) = &PL_sv_undef;
+	    XPUSHs(&PL_sv_undef);
 	  }
 	}
 
@@ -2066,13 +2058,14 @@ int
 XML_GetSpecifiedAttributeCount(parser)
 	XML_Parser			parser
 
-char *
+void
 XML_ErrorString(code)
 	int				code
-    CODE:
-	const char *ret = XML_ErrorString(code);
-	ST(0) = sv_newmortal();
-	sv_setpv((SV*)ST(0), ret);
+    PPCODE:
+	{
+	  const char *ret = XML_ErrorString(code);
+	  XPUSHs(sv_2mortal(newSVpv(ret, 0)));
+	}
 
 void
 XML_ExpatVersion()
