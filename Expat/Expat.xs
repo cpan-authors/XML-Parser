@@ -297,6 +297,10 @@ generate_model(XML_Content *model) {
 	hv_store(hash, "Children", 8, newRV_noinc((SV *) children), 0);
       }
     break;
+
+  case XML_CTYPE_EMPTY:
+  case XML_CTYPE_ANY:
+    break;
   }
 
   return obj;
