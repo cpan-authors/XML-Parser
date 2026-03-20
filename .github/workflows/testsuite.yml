@@ -144,7 +144,7 @@ jobs:
 
           - name: netbsd
             version: '10.1'
-            pkginstall: pkgin -y install expat || true
+            pkginstall: pkgin -y install perl expat || true
 
     steps:
       - uses: actions/checkout@v4
