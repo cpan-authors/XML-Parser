@@ -310,9 +310,9 @@ static int
 parse_stream(XML_Parser parser, SV * ioref)
 {
   dSP;
-  SV *		tbuff;
-  SV *		tsiz;
-  char *	linebuff;
+  SV *		tbuff = NULL;
+  SV *		tsiz = NULL;
+  char *	linebuff = NULL;
   STRLEN	lblen;
   STRLEN	br = 0;
   int		buffsize;
