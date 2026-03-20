@@ -48,7 +48,7 @@ jobs:
           cpanfile: "cpanfile"
       - name: Remove LWP::UserAgent
         run: |
-          perl -MLWP::UserAgent -e 'print $INC{"LWP/UserAgent.pm"}' | xargs rm -f
+          perl -MLWP::UserAgent -e'unlink $INC{"LWP/UserAgent.pm"}'
           ! perl -MLWP::UserAgent -e1
       - name: Makefile.PL
         run: perl Makefile.PL
