@@ -47,7 +47,10 @@ jobs:
         with:
           cpanfile: "cpanfile"
       - name: Remove LWP::UserAgent
-        run: rm -f $(perldoc -l LWP::UserAgent)
+        run: |
+          rm -f $(perldoc -l LWP::UserAgent)
+          perldoc -l LWP::UserAgent || true
+          ! perl -MLWP::UserAgent -e1
       - name: Makefile.PL
         run: perl Makefile.PL
       - name: make test
