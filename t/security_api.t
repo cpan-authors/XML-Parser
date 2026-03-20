@@ -10,9 +10,6 @@ use XML::Parser;
 # in the XS code can match even when the actual C functions are absent
 # (e.g., FreeBSD expat headers report >= 2.7.2 but lack the symbols).
 
-my %ev = XML::Parser::Expat::expat_version_info();
-my $expat_numver = $ev{major} * 1_000_000 + $ev{minor} * 1_000 + $ev{micro};
-
 my $p = XML::Parser::Expat->new;
 
 # BillionLaughs APIs (require libexpat >= 2.4.0 with XML_DTD)
@@ -67,8 +64,9 @@ SKIP: {
 
 # AllocTracker APIs (require libexpat >= 2.7.2)
 SKIP: {
+    my $has_at = defined &XML::Parser::Expat::SetAllocTrackerMaximumAmplification;
     skip "AllocTracker API not available (libexpat < 2.7.2)", 5
-      unless $expat_numver >= 2_007_002;
+      unless $has_at;
 
     # Test via Expat object methods
     ok( $p->alloc_tracker_maximum_amplification(100.0),
@@ -108,8 +106,9 @@ SKIP: {
 }
 
 SKIP: {
+    my $has_at = defined &XML::Parser::Expat::SetAllocTrackerMaximumAmplification;
     skip "AllocTracker API is available, cannot test missing-API error", 1
-      if $expat_numver >= 2_007_002;
+      if $has_at;
 
     eval { $p->alloc_tracker_maximum_amplification(100.0); };
     like( $@, qr/not available/, "croak with helpful message when AllocTracker API unavailable" );
