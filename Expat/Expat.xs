@@ -2317,7 +2317,8 @@ XML_Do_External_Parse(parser, result)
     OUTPUT:
         RETVAL
 
-#if defined(XML_DTD) && defined(XML_MAJOR_VERSION) \
+#if (defined(XML_DTD) || (defined(XML_GE) && XML_GE == 1)) \
+    && defined(XML_MAJOR_VERSION) \
     && (XML_MAJOR_VERSION > 2 \
         || (XML_MAJOR_VERSION == 2 && XML_MINOR_VERSION >= 4))
 
