@@ -1007,6 +1007,16 @@ externalEntityRef(XML_Parser parser,
      when the user did not explicitly request ParseParamEnt, silently
      treat the PE as empty and let expat continue processing subsequent
      DTD declarations normally.  See GH #53. */
+  /* For parameter entities and DTD (context is NULL per expat docs),
+     when the user did not explicitly request ParseParamEnt, treat the
+     PE as empty content so expat continues dispatching subsequent DTD
+     declarations to their proper handlers (Attlist, Element, etc.).
+
+     We must actually create the sub-parser and feed it an empty document
+     rather than simply returning 1, because expat needs the sub-parser's
+     parse completion to finalize entity processing.  Without this, expat
+     routes all subsequent DTD declarations to the Default handler instead
+     of the dedicated handlers.  See GH #53 and GH #173. */
   if (open == NULL && !cbv->parseparam) {
     XML_Parser entpar = XML_ExternalEntityParserCreate(parser, open, 0);
     if (entpar) {
