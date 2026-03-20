@@ -163,6 +163,36 @@ jobs:
             make
             prove -wlvmb t
 
+  fedora:
+    needs: [ubuntu, linux]
+    runs-on: ubuntu-latest
+
+    container:
+      image: fedora:43
+
+    env:
+      PERL_USE_UNSAFE_INC: 0
+      AUTOMATED_TESTING: 1
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          dnf -y install perl expat-devel git make gcc patch
+      - name: perl -V
+        run: perl -V
+      - name: Install Dependencies
+        uses: perl-actions/install-with-cpm@v1
+        with:
+          sudo: false
+          cpanfile: "cpanfile"
+      - name: Makefile.PL
+        run: perl Makefile.PL
+      - name: make
+        run: make
+      - name: make test
+        run: make test
+
   macOS:
     needs: [ubuntu, linux]
     runs-on: macos-latest
