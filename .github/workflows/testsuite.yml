@@ -178,14 +178,14 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install dependencies
         run: |
-          dnf -y install perl expat-devel "perl(CPAN)" "perl(Test::More)" \
-            "perl(ExtUtils::MakeMaker)" git make gcc patch
+          dnf -y install perl expat-devel git make gcc patch
       - name: perl -V
         run: perl -V
-      - name: Install CPAN Dependencies
-        run: |
-          cpan -T App::cpanminus
-          cpanm --notest --installdeps --with-configure .
+      - name: Install Dependencies
+        uses: perl-actions/install-with-cpm@v1
+        with:
+          sudo: false
+          cpanfile: "cpanfile"
       - name: Makefile.PL
         run: perl Makefile.PL
       - name: make
