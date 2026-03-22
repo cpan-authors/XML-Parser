@@ -10,7 +10,7 @@ use Carp;
 
 our $VERSION = '2.51';
 
-our ( %Encoding_Table, @Encoding_Path, $have_File_Spec );
+our ( %Encoding_Table, @Encoding_Path );
 
 use File::Spec ();
 use File::ShareDir ();
