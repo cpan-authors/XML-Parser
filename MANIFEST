@@ -92,6 +92,7 @@ t/stream.t			Test script
 t/stream_attr_escape.t
 t/stream_localize.t
 t/styles.t			Test script
+t/subs_inherited.t
 t/tree_entity_expand.t
 t/utf8_handling.t
 t/utf8_stream.t
