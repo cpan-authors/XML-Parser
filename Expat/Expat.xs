@@ -17,20 +17,7 @@
 
 #undef convert
 
-#include "patchlevel.h"
 #include "encoding.h"
-
-
-/* Version 5.005_5x (Development version for 5.006) doesn't like sv_...
-   anymore, but 5.004 doesn't know about PL_sv..
-   Don't want to push up required version just for this. */
-
-#if PATCHLEVEL < 5
-#define PL_sv_undef	sv_undef
-#define PL_sv_no	sv_no
-#define PL_sv_yes	sv_yes
-#define PL_na		na
-#endif
 
 #define BUFSIZE 32768
 
@@ -48,8 +35,7 @@
   else\
     cbv->fld = newSVsv(fld)
 
-/* Macro to push old handler value onto return stack. This is done here
-   to get around a bug in 5.004 sv_2mortal function. */
+/* Macro to push old handler value onto return stack. */
 
 #define PUSHRET \
   ST(0) = RETVAL;\
@@ -117,8 +103,6 @@ static const char *QuantChar[] = {"", "?", "*", "+"};
 static void suspend_callbacks(CallbackVector *);
 static void resume_callbacks(CallbackVector *);
 
-#ifdef SvUTF8_on
-
 static SV *
 newUTF8SVpv(char *s, STRLEN len) {
   SV *sv;
@@ -138,29 +122,14 @@ newUTF8SVpvn(char *s, STRLEN len) {
   return sv;
 }
 
-#else  /* SvUTF8_on not defined */
-
-#define newUTF8SVpv newSVpv
-#define newUTF8SVpvn newSVpvn
-
-#endif
-
 static void*
 mymalloc(size_t size) {
-#ifndef LEAKTEST
   return safemalloc(size);
-#else
-  return safexmalloc(328,size);
-#endif
 }
 
 static void*
 myrealloc(void *p, size_t s) {
-#ifndef LEAKTEST
   return saferealloc(p, s);
-#else
-  return safexrealloc(p, s);
-#endif
 }
 
 static void
@@ -969,9 +938,6 @@ externalEntityRef(XML_Parser parser,
 		  const char* pubid)
 {
   dSP;
-#if defined(USE_THREADS) && PATCHLEVEL==6
-  dTHX;
-#endif
 
   int count;
   int ret = 0;

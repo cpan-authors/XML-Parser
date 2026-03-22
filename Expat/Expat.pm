@@ -549,10 +549,6 @@ sub parse {
         if ( ref($arg) and UNIVERSAL::isa( $arg, 'IO::Handle' ) ) {
             $ioref = $arg;
         }
-        elsif ( $] < 5.008 and defined tied($arg) ) {
-            require IO::Handle;
-            $ioref = $arg;
-        }
         else {
             require IO::Handle;
             eval {
