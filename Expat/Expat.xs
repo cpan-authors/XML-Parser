@@ -117,29 +117,6 @@ static const char *QuantChar[] = {"", "?", "*", "+"};
 static void suspend_callbacks(CallbackVector *);
 static void resume_callbacks(CallbackVector *);
 
-#if PATCHLEVEL < 5 && SUBVERSION < 5
-
-/* ================================================================
-** This is needed where the length is explicitly given. The expat
-** library may sometimes give us zero-length strings. Perl's newSVpv
-** interprets a zero length as a directive to do a strlen. This
-** function is used when we want to force length to mean length, even
-** if zero.
-*/
-
-static SV *
-newSVpvn(char *s, STRLEN len)
-{
-  SV *sv;
-
-  sv = newSV(0);
-  sv_setpvn(sv, s, len);
-  return sv;
-}  /* End newSVpvn */
-
-#define ERRSV GvSV(errgv)
-#endif
-
 #ifdef SvUTF8_on
 
 static SV *
