@@ -140,6 +140,16 @@ myfree(void *p) {
 static XML_Memory_Handling_Suite ms = {mymalloc, myrealloc, myfree};
 
 static void
+free_cbv(CallbackVector *cbv)
+{
+  if (cbv) {
+    SvREFCNT_dec(cbv->self_sv);
+    Safefree(cbv->st_serial_stack);
+    Safefree(cbv);
+  }
+}
+
+static void
 append_error(XML_Parser parser, char * err)
 {
   dSP;
@@ -264,7 +274,6 @@ parse_stream(XML_Parser parser, SV * ioref)
   int		buffsize;
   int		done = 0;
   int		ret = 1;
-  char *	msg = NULL;
   CallbackVector * cbv;
   cbv = (CallbackVector*) XML_GetUserData(parser);
 
@@ -311,6 +320,9 @@ parse_stream(XML_Parser parser, SV * ioref)
     tbuff = newSV(0);
     tsiz = newSViv(BUFSIZE);
     buffsize = BUFSIZE;
+    /* Register for cleanup so croak() in the loop won't leak them */
+    SAVEFREESV(tbuff);
+    SAVEFREESV(tsiz);
   }
 
   while (! done)
@@ -380,12 +392,9 @@ parse_stream(XML_Parser parser, SV * ioref)
     }
 
   if (! ret)
-    append_error(parser, msg);
+    append_error(parser, NULL);
 
-  if (! cbv->delim) {
-    SvREFCNT_dec(tsiz);
-    SvREFCNT_dec(tbuff);
-  }
+  /* tbuff and tsiz are freed by SAVEFREESV via FREETMPS/LEAVE below */
       
   FREETMPS;
   LEAVE;
@@ -1024,19 +1033,20 @@ externalEntityRef(XML_Parser parser,
 	  New(326, errmsg, len + 1, char);
 	  if (len)
 	    Copy(hold, errmsg, len, char);
+	  errmsg[len] = '\0';
 	  goto Extparse_Cleanup;
 	}
 
 	if (count > 0)
 	  ret = POPi;
-	  
+
 	parse_done = 1;
 
       Extparse_Cleanup:
 	cbv->p = parser;
 	sv_setiv(*pval, PTR2IV(parser));
 	XML_ParserFree(entpar);
-	     
+
 	if (cbv->extfin_sv) {
 	  PUSHMARK(sp);
 	  PUSHs(cbv->self_sv);
@@ -1045,8 +1055,14 @@ externalEntityRef(XML_Parser parser,
 	  SPAGAIN;
 	}
 
-	if (SvTRUE(ERRSV))
+	/* Use saved error from Do_External_Parse if available,
+	   since the extfin callback above may have cleared ERRSV */
+	if (errmsg)
+	  append_error(parser, errmsg);
+	else if (SvTRUE(ERRSV))
 	  append_error(parser, SvPV_nolen(ERRSV));
+
+	Safefree(errmsg);
       }
     }
   }
@@ -1283,31 +1299,39 @@ XML_ParserCreate(self_sv, enc_sv, namespaces)
 	    cbv->no_expand = 1;
 
 	  spp = hv_fetch((HV*)SvRV(cbv->self_sv), "Context", 7, 0);
-	  if (! spp || ! *spp || !SvROK(*spp))
+	  if (! spp || ! *spp || !SvROK(*spp)) {
+	    free_cbv(cbv);
 	    croak("XML::Parser instance missing Context");
+	  }
 
 	  cbv->context = (AV*) SvRV(*spp);
-	  
+
 	  cbv->ns = (unsigned) namespaces;
 	  if (namespaces)
 	    {
 	      spp = hv_fetch((HV*)SvRV(cbv->self_sv), "New_Prefixes", 12, 0);
-	      if (! spp || ! *spp || !SvROK(*spp))
+	      if (! spp || ! *spp || !SvROK(*spp)) {
+	        free_cbv(cbv);
 	        croak("XML::Parser instance missing New_Prefixes");
+	      }
 
 	      cbv->new_prefix_list = (AV *) SvRV(*spp);
 
 	      spp = hv_fetch((HV*)SvRV(cbv->self_sv), "Namespace_Table",
 			     15, FALSE);
-	      if (! spp || ! *spp || !SvROK(*spp))
+	      if (! spp || ! *spp || !SvROK(*spp)) {
+	        free_cbv(cbv);
 	        croak("XML::Parser instance missing Namespace_Table");
+	      }
 
 	      cbv->nstab = (HV *) SvRV(*spp);
 
 	      spp = hv_fetch((HV*)SvRV(cbv->self_sv), "Namespace_List",
 			     14, FALSE);
-	      if (! spp || ! *spp || !SvROK(*spp))
+	      if (! spp || ! *spp || !SvROK(*spp)) {
+	        free_cbv(cbv);
 	        croak("XML::Parser instance missing Namespace_List");
+	      }
 
 	      cbv->nslst = (AV *) SvRV(*spp);
 
