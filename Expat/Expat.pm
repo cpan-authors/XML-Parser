@@ -558,6 +558,12 @@ sub parse {
                     # Glob reference not recognized as IO::Handle
                     $ioref = *{$arg}{IO};
                 }
+                elsif ( ref \$arg eq 'GLOB' ) {
+
+                    # Bare glob (*FH) — not a reference, but taking a
+                    # reference of it yields a GLOB ref. (GH#201)
+                    $ioref = *{$arg}{IO};
+                }
                 elsif ( $arg =~ /\A[^\W\d]\w*(?:::\w+)*\z/
                     && defined *{$arg} )
                 {
