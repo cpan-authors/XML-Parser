@@ -292,15 +292,16 @@ parse_stream(XML_Parser parser, SV * ioref)
       lblen = 0;
     }
     else {
-      char *	chk;
       linebuff = SvPV(tline, lblen);
-      chk = &linebuff[lblen - cbv->delimlen - 1];
 
-      if (lblen > cbv->delimlen + 1
-	  && *chk == *cbv->delim
-	  && chk[cbv->delimlen] == '\n'
-	  && strnEQ(++chk, cbv->delim + 1, cbv->delimlen - 1))
-	lblen -= cbv->delimlen + 1;
+      if (lblen > cbv->delimlen + 1) {
+	char *chk = &linebuff[lblen - cbv->delimlen - 1];
+
+	if (*chk == *cbv->delim
+	    && chk[cbv->delimlen] == '\n'
+	    && strnEQ(chk + 1, cbv->delim + 1, cbv->delimlen - 1))
+	  lblen -= cbv->delimlen + 1;
+      }
     }
 
     PUTBACK ;
@@ -999,6 +1000,11 @@ externalEntityRef(XML_Parser parser,
 	char *errmsg = (char *) 0;
 
 	entpar = XML_ExternalEntityParserCreate(parser, open, 0);
+	if (! entpar) {
+	  append_error(parser,
+	    "Couldn't create external entity sub-parser");
+	  goto Extparse_Cleanup;
+	}
 
 	XML_SetBase(entpar, XML_GetBase(parser));
 
