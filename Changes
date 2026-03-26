@@ -1,5 +1,18 @@
 Revision history for Perl extension XML::Parser.
 
+2.53 2026-03-25 (by Todd Rinaldo)
+
+  Fixes:
+    - PR #202 GH #201 Fix detection of bare glob filehandles (*FH) in
+      Expat::parse; previously only glob references were recognized
+
+  Maintenance:
+    - PR #198 Modernize encoding.t from print-ok style to Test::More
+      and expand coverage
+    - PR #197 Modernize styles.t from Test to Test::More and expand
+      coverage
+    - Ignore Mac OS metadata files (.DS_Store) in .gitignore
+
 2.52 2026-03-24 (by Todd Rinaldo)
 
   Fixes:

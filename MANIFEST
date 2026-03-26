@@ -51,6 +51,7 @@ share/x-sjis-jdk117.enc		x-sjis-jdk117 encoding map
 share/x-sjis-jisx0221.enc	x-sjis-jisx0221 encoding map
 share/x-sjis-unicode.enc	x-sjis-unicode encoding map
 t/astress.t			Test script
+t/bare_glob_filehandle.t
 t/cdata.t			Test script
 t/char_end_doc.t
 t/checklib_findcc.t
