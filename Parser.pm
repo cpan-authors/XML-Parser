@@ -876,6 +876,12 @@ Clark Cooper <F<coopercc@netheaven.com>> picked up support, changed the API
 for this version (2.x), provided documentation,
 and added some standard package features.
 
-Matt Sergeant <F<matt@sergeant.org>> is now maintaining XML::Parser
+Matt Sergeant <F<matt@sergeant.org>> was maintaining XML::Parser from 2003 to 2007.
+
+Alexandr Ciornii <F<alexchorny@gmail.com>> was maintaining XML::Parser from 2007 to 2013.
+
+Todd Rinaldo <F<toddr@cpan.org>> has been maintaining XML::Parser since 2013.
+
+The project started making use of Claude Code <F<https://claude.ai/code>> in January 2026.
 
 =cut
