@@ -1,0 +1,50 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "*"
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract release notes from Changes
+        id: changelog
+        run: |
+          tag="${GITHUB_REF_NAME}"
+
+          # Extract the changelog section for this tag version
+          perl -e '
+            my $tag = shift;
+            (my $version = $tag) =~ s/^v//;
+            my $qv = quotemeta($version);
+
+            local $/;
+            my $text = <STDIN>;
+
+            # Match from the version header to the next version header or EOF
+            if ($text =~ /^($qv\b[^\n]*\n)(.*?)(?=^\S|\z)/ms) {
+              print $2;
+            }
+          ' "$tag" < Changes > /tmp/release-notes.txt
+
+          # Fall back to a simple message if extraction fails
+          if [ ! -s /tmp/release-notes.txt ]; then
+            echo "Release ${tag}" > /tmp/release-notes.txt
+          fi
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          gh release create "$tag" \
+            --title "XML-Parser ${tag}" \
+            --notes-file /tmp/release-notes.txt
