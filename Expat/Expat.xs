@@ -2048,14 +2048,28 @@ XML_ExpatVersion()
 void
 XML_ExpatVersionInfo()
     PPCODE:
-	XML_Expat_Version info = XML_ExpatVersionInfo();
+	const char *ver = (const char *)XML_ExpatVersion();
+	/* Parse "expat_X.Y.Z" to extract runtime version components.
+	   Avoids XML_ExpatVersionInfo() struct return which is broken
+	   under -fpcc-struct-return ABI mismatch. */
+	int major = 0, minor = 0, micro = 0;
+	const char *p = ver;
+	while (*p && *p != '_') p++;
+	if (*p == '_') p++;
+	major = atoi(p);
+	while (*p && *p != '.') p++;
+	if (*p == '.') p++;
+	minor = atoi(p);
+	while (*p && *p != '.') p++;
+	if (*p == '.') p++;
+	micro = atoi(p);
 	EXTEND(SP, 6);
 	PUSHs(sv_2mortal(newSVpv("major", 5)));
-	PUSHs(sv_2mortal(newSViv(info.major)));
+	PUSHs(sv_2mortal(newSViv(major)));
 	PUSHs(sv_2mortal(newSVpv("minor", 5)));
-	PUSHs(sv_2mortal(newSViv(info.minor)));
+	PUSHs(sv_2mortal(newSViv(minor)));
 	PUSHs(sv_2mortal(newSVpv("micro", 5)));
-	PUSHs(sv_2mortal(newSViv(info.micro)));
+	PUSHs(sv_2mortal(newSViv(micro)));
 
 SV *
 XML_LoadEncoding(data, size)
