@@ -692,17 +692,6 @@ defaulthandle(void *userData, const char *string, int len)
 {
   dSP;
   CallbackVector* cbv = (CallbackVector*) userData;
-  SV *handler;
-
-  /* If a Char handler is registered and this is character data (not markup),
-     forward to the Char handler instead of Default. Libexpat sends character
-     data outside the root element to the default handler, but users expect
-     the Char handler to be called (rt.cpan.org #46685). */
-  if (SvTRUE(cbv->char_sv) && len > 0
-      && string[0] != '<' && string[0] != '&')
-    handler = cbv->char_sv;
-  else
-    handler = cbv->dflt_sv;
 
   ENTER;
   SAVETMPS;
@@ -712,7 +701,7 @@ defaulthandle(void *userData, const char *string, int len)
   PUSHs(cbv->self_sv);
   PUSHs(sv_2mortal(newUTF8SVpvn((char*)string, len)));
   PUTBACK;
-  perl_call_sv(handler, G_DISCARD|G_VOID);
+  perl_call_sv(cbv->dflt_sv, G_DISCARD|G_VOID);
 
   FREETMPS;
   LEAVE;
@@ -877,7 +866,7 @@ xmlDecl(void *userData,
   PUSHs(encoding ? sv_2mortal(newUTF8SVpv((char *)encoding, 0))
 	: &PL_sv_undef);
   PUSHs(standalone == -1 ? &PL_sv_undef
-	: sv_2mortal(standalone ? newSVpvn("yes", 3) : newSVpvn("no", 2)));
+	: (standalone ? &PL_sv_yes : &PL_sv_no));
   PUTBACK;
   perl_call_sv(cbv->xmldec_sv, G_DISCARD|G_VOID);
   FREETMPS;
