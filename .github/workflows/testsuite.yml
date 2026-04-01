@@ -59,6 +59,37 @@ jobs:
       - name: make test
         run: make test
 
+  asan:
+    needs: [ubuntu]
+    runs-on: ubuntu-latest
+
+    env:
+      PERL_USE_UNSAFE_INC: 0
+      AUTOMATED_TESTING: 1
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: perl -V
+        run: perl -V
+      - name: Install Dependencies
+        uses: perl-actions/install-with-cpm@v1
+        with:
+          cpanfile: "cpanfile"
+      - name: Install libasan
+        run: sudo apt-get update && sudo apt-get install -y libasan8
+      - name: Build with AddressSanitizer
+        run: |
+          ASAN_LIB=$(gcc -print-file-name=libasan.so)
+          perl Makefile.PL OPTIMIZE="-g -fsanitize=address -fno-omit-frame-pointer" \
+            LDDLFLAGS="-shared -fsanitize=address"
+          make
+      - name: Run tests under ASan
+        run: |
+          ASAN_LIB=$(gcc -print-file-name=libasan.so)
+          ASAN_OPTIONS="detect_leaks=0:halt_on_error=1" \
+            LD_PRELOAD="$ASAN_LIB" \
+            make test
+
   disttest:
     env:
       PERL_USE_UNSAFE_INC: 0
