@@ -290,3 +290,50 @@ jobs:
         run: make
       - name: Run Tests
         run: make test
+
+  downstream:
+    needs: [ubuntu, no-lwp, asan, disttest, linux, BSDs, fedora, macOS, windows]
+    runs-on: ubuntu-latest
+
+    env:
+      PERL_USE_UNSAFE_INC: 0
+      AUTOMATED_TESTING: 1
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: perl -V
+        run: perl -V
+      - name: Install Dependencies
+        uses: perl-actions/install-with-cpm@v1
+        with:
+          cpanfile: "cpanfile"
+      - name: Install XML-Parser from checkout
+        run: |
+          perl Makefile.PL
+          make
+          make install
+      - name: Install cpanm
+        run: |
+          cpm install -g App::cpanminus
+      - name: Test downstream modules
+        run: |
+          failed=""
+          for module in XML::XPath XML::DOM XML::Twig; do
+            echo "========================================"
+            echo "Testing $module"
+            echo "========================================"
+            if cpanm --verbose "$module"; then
+              echo "PASS: $module"
+            else
+              echo "FAIL: $module"
+              failed="$failed $module"
+            fi
+            echo ""
+          done
+          if [ -n "$failed" ]; then
+            echo "========================================"
+            echo "FAILED downstream modules:$failed"
+            echo "========================================"
+            exit 1
+          fi
+          echo "All downstream modules passed."
