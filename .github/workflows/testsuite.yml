@@ -311,10 +311,10 @@ jobs:
         run: |
           perl Makefile.PL
           make
-          make install
+          sudo make install
       - name: Install cpanm
         run: |
-          cpm install -g App::cpanminus
+          sudo cpm install -g App::cpanminus
       - name: Test downstream modules
         run: |
           failed=""
@@ -322,7 +322,7 @@ jobs:
             echo "========================================"
             echo "Testing $module"
             echo "========================================"
-            if cpanm --verbose "$module"; then
+            if sudo cpanm --verbose "$module"; then
               echo "PASS: $module"
             else
               echo "FAIL: $module"
