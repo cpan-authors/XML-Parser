@@ -332,6 +332,8 @@ jobs:
           make test
           sudo make install
       - name: Test XML::DOM
+        env:
+          PERL_USE_UNSAFE_INC: 1
         run: |
           cd /tmp/downstream/XML-DOM-1.46
           perl Makefile.PL
