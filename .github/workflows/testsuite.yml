@@ -302,38 +302,41 @@ jobs:
       - uses: actions/checkout@v4
       - name: perl -V
         run: perl -V
-      - name: Install Dependencies
-        uses: perl-actions/install-with-cpm@v1
-        with:
-          cpanfile: "cpanfile"
+      - name: Install XML-Parser deps
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libwww-perl libfile-sharedir-perl libfile-sharedir-install-perl
       - name: Install XML-Parser from checkout
         run: |
           perl Makefile.PL
           make
           sudo make install
-      - name: Install downstream deps
-        run: |
-          sudo cpm install -g XML::RegExp   # XML::DOM dep
-          sudo cpm install -g XML::XPath    # install as dep for XML::Twig
-          sudo cpm install -g XML::DOM      # install as dep for XML::Twig
-          sudo cpm install -g Tie::IxHash IO::CaptureOutput Test::Pod  # XML::Twig optional test deps
       - name: Download downstream tarballs
         run: |
           mkdir -p /tmp/downstream
           cd /tmp/downstream
+          curl -sL https://cpan.metacpan.org/authors/id/T/TJ/TJMATHER/XML-RegExp-0.04.tar.gz | tar xz
           curl -sL https://cpan.metacpan.org/authors/id/M/MA/MANWAR/XML-XPath-1.48.tar.gz | tar xz
           curl -sL https://cpan.metacpan.org/authors/id/T/TJ/TJMATHER/XML-DOM-1.46.tar.gz | tar xz
           curl -sL https://cpan.metacpan.org/authors/id/M/MI/MIROD/XML-Twig-3.54.tar.gz | tar xz
+      - name: Install XML::RegExp (XML::DOM dep)
+        run: |
+          cd /tmp/downstream/XML-RegExp-0.04
+          perl Makefile.PL
+          make
+          sudo make install
       - name: Test XML::XPath
         run: |
           cd /tmp/downstream/XML-XPath-1.48
           perl Makefile.PL
           make test
+          sudo make install
       - name: Test XML::DOM
         run: |
           cd /tmp/downstream/XML-DOM-1.46
           perl Makefile.PL
           make test
+          sudo make install
       - name: Test XML::Twig
         run: |
           cd /tmp/downstream/XML-Twig-3.54
