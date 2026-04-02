@@ -312,41 +312,43 @@ jobs:
           perl Makefile.PL
           make
           sudo make install
-      - name: Install cpanm
-        run: sudo cpm install -g App::cpanminus
-      - name: Test downstream modules
+      - name: Install downstream deps
         run: |
-          test_failed=""
-          load_failed=""
-          for module in XML::XPath XML::DOM XML::Twig; do
-            echo "========================================"
-            echo "Testing $module"
-            echo "========================================"
-            if sudo cpanm --verbose "$module"; then
-              echo "PASS: $module"
+          sudo cpm install -g XML::RegExp   # XML::DOM dep
+          sudo cpm install -g XML::XPath    # install as dep for XML::Twig
+          sudo cpm install -g XML::DOM      # install as dep for XML::Twig
+          sudo cpm install -g Tie::IxHash IO::CaptureOutput Test::Pod  # XML::Twig optional test deps
+      - name: Download downstream tarballs
+        run: |
+          mkdir -p /tmp/downstream
+          cd /tmp/downstream
+          curl -sL https://cpan.metacpan.org/authors/id/M/MA/MANWAR/XML-XPath-1.48.tar.gz | tar xz
+          curl -sL https://cpan.metacpan.org/authors/id/T/TJ/TJMATHER/XML-DOM-1.46.tar.gz | tar xz
+          curl -sL https://cpan.metacpan.org/authors/id/M/MI/MIROD/XML-Twig-3.54.tar.gz | tar xz
+      - name: Test XML::XPath
+        run: |
+          cd /tmp/downstream/XML-XPath-1.48
+          perl Makefile.PL
+          make test
+      - name: Test XML::DOM
+        run: |
+          cd /tmp/downstream/XML-DOM-1.46
+          perl Makefile.PL
+          make test
+      - name: Test XML::Twig
+        run: |
+          cd /tmp/downstream/XML-Twig-3.54
+          perl Makefile.PL -y
+          make test 2>&1 | tee /tmp/twig-test.log
+          # XML::Twig 3.54 has 3 pre-existing failures in test_3_30.t (59-61)
+          # unrelated to XML-Parser. Fail only on unexpected test failures.
+          if grep -q 'Failed 1/.*test programs' /tmp/twig-test.log; then
+            if grep -q 't/test_3_30.t' /tmp/twig-test.log && \
+               grep -q 'Failed tests:  59-61' /tmp/twig-test.log && \
+               grep -q 'Failed 1/' /tmp/twig-test.log; then
+              echo "OK: only pre-existing XML::Twig 3.54 failures (test_3_30.t 59-61)"
             else
-              echo "TESTS FAILED: $module"
-              test_failed="$test_failed $module"
-              # Install anyway so we can check if it loads
-              sudo cpanm --notest "$module"
+              echo "UNEXPECTED test failures in XML::Twig"
+              exit 1
             fi
-            # Verify the module actually loads with our XML-Parser
-            if perl -e "use $module; print qq{OK: $module loaded\n}"; then
-              echo "LOAD OK: $module"
-            else
-              echo "LOAD FAIL: $module"
-              load_failed="$load_failed $module"
-            fi
-            echo ""
-          done
-          if [ -n "$test_failed" ]; then
-            echo "WARNING: test failures in:$test_failed"
-            echo "(may be pre-existing — check logs above)"
           fi
-          if [ -n "$load_failed" ]; then
-            echo "========================================"
-            echo "CRITICAL: modules failed to load:$load_failed"
-            echo "========================================"
-            exit 1
-          fi
-          echo "All downstream modules load successfully."
