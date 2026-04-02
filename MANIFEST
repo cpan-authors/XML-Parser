@@ -66,6 +66,7 @@ t/encoding.t			Test script
 t/error_hint.t
 t/error_string.t
 t/expat_version.t
+t/ext_ent_io_control.t
 t/ext.ent			External entity for parament.t test
 t/ext2.ent			External entity for parament.t test
 t/extern_ent_lexical_glob.t
