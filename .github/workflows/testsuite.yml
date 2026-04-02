@@ -296,7 +296,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      PERL_USE_UNSAFE_INC: 0
       AUTOMATED_TESTING: 1
 
     steps:
