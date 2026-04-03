@@ -290,3 +290,69 @@ jobs:
         run: make
       - name: Run Tests
         run: make test
+
+  downstream:
+    needs: [ubuntu, no-lwp, asan, disttest, linux, BSDs, fedora, macOS, windows]
+    runs-on: ubuntu-latest
+
+    env:
+      AUTOMATED_TESTING: 1
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: perl -V
+        run: perl -V
+      - name: Install deps
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libwww-perl libfile-sharedir-perl libfile-sharedir-install-perl libpath-tiny-perl libxml-perl
+      - name: Install XML-Parser from checkout
+        run: |
+          perl Makefile.PL
+          make
+          sudo make install
+      - name: Download downstream tarballs
+        run: |
+          mkdir -p /tmp/downstream
+          cd /tmp/downstream
+          curl -sL https://cpan.metacpan.org/authors/id/T/TJ/TJMATHER/XML-RegExp-0.04.tar.gz | tar xz
+          curl -sL https://cpan.metacpan.org/authors/id/M/MA/MANWAR/XML-XPath-1.48.tar.gz | tar xz
+          curl -sL https://cpan.metacpan.org/authors/id/T/TJ/TJMATHER/XML-DOM-1.46.tar.gz | tar xz
+          curl -sL https://cpan.metacpan.org/authors/id/M/MI/MIROD/XML-Twig-3.54.tar.gz | tar xz
+      - name: Install XML::RegExp (XML::DOM dep)
+        run: |
+          cd /tmp/downstream/XML-RegExp-0.04
+          perl Makefile.PL
+          make
+          sudo make install
+      - name: Test XML::XPath
+        run: |
+          cd /tmp/downstream/XML-XPath-1.48
+          perl Makefile.PL
+          make test
+          sudo make install
+      - name: Test XML::DOM
+        env:
+          PERL_USE_UNSAFE_INC: 1
+        run: |
+          cd /tmp/downstream/XML-DOM-1.46
+          perl Makefile.PL
+          make test
+          sudo make install
+      - name: Test XML::Twig
+        run: |
+          cd /tmp/downstream/XML-Twig-3.54
+          perl Makefile.PL -y
+          make test 2>&1 | tee /tmp/twig-test.log
+          # XML::Twig 3.54 has 3 pre-existing failures in test_3_30.t (59-61)
+          # unrelated to XML-Parser. Fail only on unexpected test failures.
+          if grep -q 'Failed 1/.*test programs' /tmp/twig-test.log; then
+            if grep -q 't/test_3_30.t' /tmp/twig-test.log && \
+               grep -q 'Failed tests:  59-61' /tmp/twig-test.log && \
+               grep -q 'Failed 1/' /tmp/twig-test.log; then
+              echo "OK: only pre-existing XML::Twig 3.54 failures (test_3_30.t 59-61)"
+            else
+              echo "UNEXPECTED test failures in XML::Twig"
+              exit 1
+            fi
+          fi
