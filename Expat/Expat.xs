@@ -1331,13 +1331,21 @@ XML_ParserCreate(self_sv, enc_sv, namespaces)
 	      cbv->nslst = (AV *) SvRV(*spp);
 
 	      RETVAL = XML_ParserCreate_MM(enc, &ms, nsdelim);
+	      if (! RETVAL) {
+	        free_cbv(cbv);
+	        croak("Could not create XML parser");
+	      }
 	      XML_SetNamespaceDeclHandler(RETVAL,nsStart, nsEnd);
 	    }
 	    else
 	    {
 	      RETVAL = XML_ParserCreate_MM(enc, &ms, NULL);
+	      if (! RETVAL) {
+	        free_cbv(cbv);
+	        croak("Could not create XML parser");
+	      }
 	    }
-	    
+
 	  cbv->p = RETVAL;
 	  XML_SetUserData(RETVAL, (void *) cbv);
 	  XML_SetElementHandler(RETVAL, startElement, endElement);
