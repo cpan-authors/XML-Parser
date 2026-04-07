@@ -692,6 +692,24 @@ defaulthandle(void *userData, const char *string, int len)
 {
   dSP;
   CallbackVector* cbv = (CallbackVector*) userData;
+  SV *handler;
+
+  /* If a Char handler is registered and we are outside the root element
+     (context stack is empty) after having seen at least one element
+     (st_serial > 0), forward character data to the Char handler.
+     Libexpat routes character data outside the root element to the
+     default handler, but users expect the Char handler to receive it
+     (rt.cpan.org #46685 / GitHub issue #47).
+
+     We use the parser's own element context stack rather than inspecting
+     the string content — the previous heuristic (checking first char)
+     was too broad and broke downstream modules (PR #118 / #214). */
+  if (SvTRUE(cbv->char_sv)
+      && av_count(cbv->context) == 0
+      && cbv->st_serial > 0)
+    handler = cbv->char_sv;
+  else
+    handler = cbv->dflt_sv;
 
   ENTER;
   SAVETMPS;
@@ -701,7 +719,7 @@ defaulthandle(void *userData, const char *string, int len)
   PUSHs(cbv->self_sv);
   PUSHs(sv_2mortal(newUTF8SVpvn((char*)string, len)));
   PUTBACK;
-  perl_call_sv(cbv->dflt_sv, G_DISCARD|G_VOID);
+  perl_call_sv(handler, G_DISCARD|G_VOID);
 
   FREETMPS;
   LEAVE;
