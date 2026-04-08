@@ -8,7 +8,7 @@ use strict;
 use XSLoader;
 use Carp;
 
-our $VERSION = '2.56';
+our $VERSION = '2.57';
 
 our ( %Encoding_Table, @Encoding_Path );
 
