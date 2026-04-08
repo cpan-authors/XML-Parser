@@ -33,6 +33,61 @@ jobs:
       - name: make test
         run: make test
 
+  coverage:
+    needs: [ubuntu]
+    runs-on: ubuntu-latest
+
+    env:
+      PERL_USE_UNSAFE_INC: 0
+      AUTOMATED_TESTING: 1
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: perl -V
+        run: perl -V
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y lcov
+      - name: Install Dependencies
+        uses: perl-actions/install-with-cpm@v1
+        with:
+          cpanfile: "cpanfile"
+          install: "Devel::Cover"
+      - name: expat version
+        run: pkg-config --modversion expat 2>/dev/null || true
+      - name: Build with coverage flags
+        run: |
+          perl Makefile.PL OPTIMIZE="-g -O0 --coverage -fprofile-arcs -ftest-coverage" \
+            LDDLFLAGS="-shared --coverage"
+          make
+      - name: Run tests with Devel::Cover
+        run: |
+          HARNESS_PERL_SWITCHES="-MDevel::Cover=-coverage,statement,branch,condition,subroutine,+ignore,^t/" \
+            make test
+      - name: Generate Perl coverage report
+        run: |
+          cover -report text
+          cover -report json
+      - name: Generate XS/C coverage report
+        run: |
+          find . -name '*.gcno' -o -name '*.gcda' | head -5
+          lcov --capture --directory . --output-file xs_coverage.lcov --rc lcov_branch_coverage=1 || true
+          lcov --remove xs_coverage.lcov '/usr/*' --output-file xs_coverage.lcov --rc lcov_branch_coverage=1 || true
+          lcov --list xs_coverage.lcov || true
+      - name: Upload Perl coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: cover_db/cover.json
+          flags: perl
+          name: perl-coverage
+        continue-on-error: true
+      - name: Upload XS/C coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: xs_coverage.lcov
+          flags: xs
+          name: xs-coverage
+        continue-on-error: true
+
   no-lwp:
     env:
       PERL_USE_UNSAFE_INC: 0
