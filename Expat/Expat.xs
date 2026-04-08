@@ -64,6 +64,9 @@ typedef struct {
   unsigned ns:1;
   unsigned no_expand:1;
   unsigned parseparam:1;
+  unsigned pe_implicit:1;
+
+  char *doctype_sysid;  /* DOCTYPE SYSTEM id for PE vs external DTD distinction */
 
   /* Callback handlers */
 
@@ -145,6 +148,7 @@ free_cbv(CallbackVector *cbv)
   if (cbv) {
     SvREFCNT_dec(cbv->self_sv);
     Safefree(cbv->st_serial_stack);
+    Safefree(cbv->doctype_sysid);
     Safefree(cbv);
   }
 }
@@ -811,23 +815,35 @@ doctypeStart(void *userData,
 	     const char* sysid,
 	     const char* pubid,
 	     int hasinternal) {
-  dSP;
   CallbackVector *cbv = (CallbackVector*) userData;
 
-  ENTER;
-  SAVETMPS;
+  /* Always track the DOCTYPE sysid so externalEntityRef can distinguish
+     PE references from external DTD references when pe_implicit is set. */
+  Safefree(cbv->doctype_sysid);
+  cbv->doctype_sysid = NULL;
+  if (sysid) {
+    Newx(cbv->doctype_sysid, strlen(sysid) + 1, char);
+    strcpy(cbv->doctype_sysid, sysid);
+  }
 
-  PUSHMARK(sp);
-  EXTEND(sp, 5);
-  PUSHs(cbv->self_sv);
-  PUSHs(sv_2mortal(newUTF8SVpv((char*)name, 0)));
-  PUSHs(sysid ? sv_2mortal(newUTF8SVpv((char*)sysid, 0)) : &PL_sv_undef);
-  PUSHs(pubid ? sv_2mortal(newUTF8SVpv((char*)pubid, 0)) : &PL_sv_undef);
-  PUSHs(hasinternal ? &PL_sv_yes : &PL_sv_no);
-  PUTBACK;
-  perl_call_sv(cbv->doctyp_sv, G_DISCARD|G_VOID);
-  FREETMPS;
-  LEAVE;
+  if (cbv->doctyp_sv && SvTRUE(cbv->doctyp_sv)) {
+    dSP;
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(sp);
+    EXTEND(sp, 5);
+    PUSHs(cbv->self_sv);
+    PUSHs(sv_2mortal(newUTF8SVpv((char*)name, 0)));
+    PUSHs(sysid ? sv_2mortal(newUTF8SVpv((char*)sysid, 0)) : &PL_sv_undef);
+    PUSHs(pubid ? sv_2mortal(newUTF8SVpv((char*)pubid, 0)) : &PL_sv_undef);
+    PUSHs(hasinternal ? &PL_sv_yes : &PL_sv_no);
+    PUTBACK;
+    perl_call_sv(cbv->doctyp_sv, G_DISCARD|G_VOID);
+    FREETMPS;
+    LEAVE;
+  }
 }  /* End doctypeStart */
 
 static void
@@ -959,6 +975,23 @@ externalEntityRef(XML_Parser parser,
      routes all subsequent DTD declarations to the Default handler instead
      of the dedicated handlers.  See GH #53 and GH #173. */
   if (open == NULL && !cbv->parseparam) {
+    /* When PE parsing was implicitly enabled for declaration handlers,
+       route PE reference text to the Default handler so DTD
+       round-tripping still works (e.g. XML::Twig).
+
+       We must NOT fire XML_DefaultCurrent for the external DTD subset
+       reference — only for PE references in the internal subset.
+       Distinguish them by comparing sysid to the stored DOCTYPE sysid:
+       the external DTD uses the same sysid as the DOCTYPE declaration,
+       while PE references use the sysid from their entity declaration. */
+    if (cbv->pe_implicit) {
+      int is_ext_dtd = (sysid == NULL && cbv->doctype_sysid == NULL)
+        || (sysid != NULL && cbv->doctype_sysid != NULL
+            && strcmp(sysid, cbv->doctype_sysid) == 0);
+      if (!is_ext_dtd)
+        XML_DefaultCurrent(parser);
+    }
+
     XML_Parser entpar = XML_ExternalEntityParserCreate(parser, open, 0);
     if (entpar) {
       XML_Parse(entpar, "", 0, 1);
@@ -1350,21 +1383,16 @@ XML_ParserCreate(self_sv, enc_sv, namespaces)
 	  XML_SetUserData(RETVAL, (void *) cbv);
 	  XML_SetElementHandler(RETVAL, startElement, endElement);
 	  XML_SetUnknownEncodingHandler(RETVAL, unknownEncoding, 0);
-	  XML_SetExternalEntityRefHandler(RETVAL, externalEntityRef);
-
+	  XML_SetStartDoctypeDeclHandler(RETVAL, doctypeStart);
 	  spp = hv_fetch((HV*)SvRV(cbv->self_sv), "ParseParamEnt",
 			 13, FALSE);
 
-	  if (spp && SvTRUE(*spp))
+	  if (spp && SvTRUE(*spp)) {
 	    cbv->parseparam = 1;
-
-	  /* Always enable parameter entity parsing so that PE references
-	     in the internal DTD subset don't cause expat to stop calling
-	     specific declaration handlers (Attlist, Element, Entity, etc.).
-	     When ParseParamEnt is not explicitly set, unresolvable PEs are
-	     silently treated as empty in externalEntityRef(). */
-	  XML_SetParamEntityParsing(RETVAL,
-	    XML_PARAM_ENTITY_PARSING_UNLESS_STANDALONE);
+	    XML_SetParamEntityParsing(RETVAL,
+	      XML_PARAM_ENTITY_PARSING_UNLESS_STANDALONE);
+	    XML_SetExternalEntityRefHandler(RETVAL, externalEntityRef);
+	  }
 
 	  spp = hv_fetch((HV*)SvRV(cbv->self_sv), "UseForeignDTD",
 			 13, FALSE);
@@ -1678,6 +1706,8 @@ XML_SetExternalEntityRefHandler(parser, extent_sv)
 	  XMLP_UPD(extent_sv);
 	  if (SvTRUE(extent_sv))
 	    exthndlr = externalEntityRef;
+	  else if (cbv->pe_implicit)
+	    exthndlr = externalEntityRef;  /* keep C handler for PE support */
 
 	  XML_SetExternalEntityRefHandler(parser, exthndlr);
 	  PUSHRET;
@@ -1715,6 +1745,13 @@ XML_SetEntityDeclHandler(parser, entdcl_sv)
 	    enthndlr = entityDecl;
 
 	  XML_SetEntityDeclHandler(parser, enthndlr);
+
+	  if (SvTRUE(entdcl_sv) && !cbv->parseparam && !cbv->pe_implicit) {
+	    cbv->pe_implicit = 1;
+	    XML_SetParamEntityParsing(parser,
+	      XML_PARAM_ENTITY_PARSING_UNLESS_STANDALONE);
+	    XML_SetExternalEntityRefHandler(parser, externalEntityRef);
+	  }
 	  PUSHRET;
 	}
 
@@ -1733,6 +1770,13 @@ XML_SetElementDeclHandler(parser, eledcl_sv)
 	    eldeclhndlr = elementDecl;
 
 	  XML_SetElementDeclHandler(parser, eldeclhndlr);
+
+	  if (SvTRUE(eledcl_sv) && !cbv->parseparam && !cbv->pe_implicit) {
+	    cbv->pe_implicit = 1;
+	    XML_SetParamEntityParsing(parser,
+	      XML_PARAM_ENTITY_PARSING_UNLESS_STANDALONE);
+	    XML_SetExternalEntityRefHandler(parser, externalEntityRef);
+	  }
 	  PUSHRET;
 	}
 
@@ -1751,6 +1795,13 @@ XML_SetAttListDeclHandler(parser, attdcl_sv)
 	    attdeclhndlr = attributeDecl;
 
 	  XML_SetAttlistDeclHandler(parser, attdeclhndlr);
+
+	  if (SvTRUE(attdcl_sv) && !cbv->parseparam && !cbv->pe_implicit) {
+	    cbv->pe_implicit = 1;
+	    XML_SetParamEntityParsing(parser,
+	      XML_PARAM_ENTITY_PARSING_UNLESS_STANDALONE);
+	    XML_SetExternalEntityRefHandler(parser, externalEntityRef);
+	  }
 	  PUSHRET;
 	}
 
@@ -1760,15 +1811,12 @@ XML_SetDoctypeHandler(parser, doctyp_sv)
 	SV *				doctyp_sv
     CODE:
 	{
-	  XML_StartDoctypeDeclHandler dtsthndlr =
-	    (XML_StartDoctypeDeclHandler) 0;
 	  CallbackVector * cbv = (CallbackVector*) XML_GetUserData(parser);
 
 	  XMLP_UPD(doctyp_sv);
-	  if (SvTRUE(doctyp_sv))
-	    dtsthndlr = doctypeStart;
-
-	  XML_SetStartDoctypeDeclHandler(parser, dtsthndlr);
+	  /* Always keep the C handler active for doctype_sysid tracking;
+	     doctypeStart checks doctyp_sv before calling Perl. */
+	  XML_SetStartDoctypeDeclHandler(parser, doctypeStart);
 	  PUSHRET;
 	}
 
