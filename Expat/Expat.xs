@@ -2174,6 +2174,9 @@ XML_LoadEncoding(data, size)
 	      RETVAL = newSVpvn(emh->name, namelen);
 
 	      New(322, entry, 1, Encinfo);
+	      if (! entry)
+	        croak("Could not allocate encoding entry");
+
 	      entry->prefixes_size = pfxsize;
 	      entry->bytemap_size  = bmsize;
 	      for (i = 0; i < 256; i++) {
@@ -2185,7 +2188,17 @@ XML_LoadEncoding(data, size)
 				       + sizeof(PrefixMap) * pfxsize);
 
 	      New(323, entry->prefixes, pfxsize, PrefixMap);
+	      if (! entry->prefixes) {
+	        Safefree(entry);
+	        croak("Could not allocate encoding prefixes");
+	      }
+
 	      New(324, entry->bytemap, bmsize, unsigned short);
+	      if (! entry->bytemap) {
+	        Safefree(entry->prefixes);
+	        Safefree(entry);
+	        croak("Could not allocate encoding bytemap");
+	      }
 
 	      for (i = 0; i < pfxsize; i++, pfx++) {
 		PrefixMap *dest = &entry->prefixes[i];
