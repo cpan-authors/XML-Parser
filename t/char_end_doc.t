@@ -1,8 +1,10 @@
-BEGIN { print "1..4\n"; }
-END { print "not ok 1\n" unless $loaded; }
+use strict;
+use warnings;
+use Test::More tests => 4;
 use XML::Parser;
-$loaded = 1;
-print "ok 1\n";
+
+# Test 1: module loads
+ok( 1, 'XML::Parser loaded' );
 
 # Regression tests for character data after root closing tag
 # (rt.cpan.org #46685 / GitHub issue #47)
@@ -38,21 +40,11 @@ $p->parse("<doc>foo</doc>\n \n");
 # Test 2: trailing whitespace must go to Default handler (not Char)
 # Redirecting to Char breaks XML::DOM with HIERARCHY_REQUEST_ERR
 my $dflt_trailing = join( '', grep { /^\s+$/ } @dflt_data );
-if ( $dflt_trailing eq "\n \n" ) {
-    print "ok 2\n";
-}
-else {
-    print "not ok 2 # Default handler did not receive trailing whitespace, got: '$dflt_trailing'\n";
-}
+is( $dflt_trailing, "\n \n", 'Default handler receives trailing whitespace' );
 
 # Test 3: Char handler should NOT receive the trailing whitespace
 my $char_trailing = join( '', grep { /^\s+$/ } @char_data );
-if ( $char_trailing eq '' ) {
-    print "ok 3\n";
-}
-else {
-    print "not ok 3 # Char handler received trailing whitespace: '$char_trailing'\n";
-}
+is( $char_trailing, '', 'Char handler does not receive trailing whitespace' );
 
 # Test 4: content INSIDE the root element that goes to Default handler
 # must NOT be redirected to Char handler (e.g. markup, entity decls).
@@ -70,10 +62,4 @@ my $p2 = XML::Parser->new(
 # Parse a doc with a comment (which goes to Default inside root)
 $p2->parse("<doc><!-- a comment -->text</doc>");
 
-my $has_comment_in_dflt = grep { /a comment/ } @inner_dflt;
-if ($has_comment_in_dflt) {
-    print "ok 4\n";
-}
-else {
-    print "not ok 4 # Comment inside root should stay in Default handler\n";
-}
+ok( ( grep { /a comment/ } @inner_dflt ), 'Comment inside root stays in Default handler' );
