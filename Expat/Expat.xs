@@ -19,6 +19,11 @@
 
 #include "encoding.h"
 
+/* av_count was introduced in Perl 5.26; provide a fallback for older perls */
+#ifndef av_count
+#define av_count(av) (av_len(av) + 1)
+#endif
+
 #define BUFSIZE 32768
 
 #define NSDELIM  '|'
