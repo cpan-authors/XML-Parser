@@ -710,7 +710,7 @@ defaulthandle(void *userData, const char *string, int len)
      the string content — the previous heuristic (checking first char)
      was too broad and broke downstream modules (PR #118 / #214). */
   if (SvTRUE(cbv->char_sv)
-      && av_count(cbv->context) == 0
+      && av_len(cbv->context) < 0
       && cbv->st_serial > 0)
     handler = cbv->char_sv;
   else
