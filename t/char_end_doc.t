@@ -4,12 +4,14 @@ use XML::Parser;
 $loaded = 1;
 print "ok 1\n";
 
-# Test that whitespace after root closing tag triggers Char handler,
-# not Default handler (rt.cpan.org #46685 / GitHub issue #47)
+# Regression tests for character data after root closing tag
+# (rt.cpan.org #46685 / GitHub issue #47)
 #
 # Libexpat sends character data outside the root element to the
-# DefaultHandler.  When a Char handler is registered, users expect
-# the Char handler to receive it instead.
+# DefaultHandler.  Redirecting it to the Char handler was attempted
+# (PR #118) but broke tree-building modules like XML::DOM, XML::Twig,
+# and XML::XPath — reverted in PR #214.  The default handler must
+# remain the sole recipient of post-root character data.
 
 my @char_data;
 my @dflt_data;
@@ -33,22 +35,23 @@ my $p = XML::Parser->new(
 
 $p->parse("<doc>foo</doc>\n \n");
 
-# Test 2: trailing whitespace should go to Char handler
-my $trailing = join( '', grep { /^\s+$/ } @char_data );
-if ( $trailing eq "\n \n" ) {
+# Test 2: trailing whitespace must go to Default handler (not Char)
+# Redirecting to Char breaks XML::DOM with HIERARCHY_REQUEST_ERR
+my $dflt_trailing = join( '', grep { /^\s+$/ } @dflt_data );
+if ( $dflt_trailing eq "\n \n" ) {
     print "ok 2\n";
 }
 else {
-    print "not ok 2 # Char handler did not receive trailing whitespace, got: '$trailing'\n";
+    print "not ok 2 # Default handler did not receive trailing whitespace, got: '$dflt_trailing'\n";
 }
 
-# Test 3: Default handler should NOT receive the trailing whitespace
-my $dflt_trailing = join( '', grep { /^\s+$/ } @dflt_data );
-if ( $dflt_trailing eq '' ) {
+# Test 3: Char handler should NOT receive the trailing whitespace
+my $char_trailing = join( '', grep { /^\s+$/ } @char_data );
+if ( $char_trailing eq '' ) {
     print "ok 3\n";
 }
 else {
-    print "not ok 3 # Default handler received trailing whitespace: '$dflt_trailing'\n";
+    print "not ok 3 # Char handler received trailing whitespace: '$char_trailing'\n";
 }
 
 # Test 4: content INSIDE the root element that goes to Default handler
