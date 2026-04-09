@@ -11,3 +11,4 @@ cpanfile
 ^Expat/Makefile$
 ^Expat/Makefile\.old$
 ^CLAUDE.md$
+^codecov\.yml$
