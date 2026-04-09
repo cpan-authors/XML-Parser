@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: perl -V
         run: perl -V
       - name: Install Dependencies
@@ -42,7 +42,7 @@ jobs:
       AUTOMATED_TESTING: 1
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: perl -V
         run: perl -V
       - name: Install system dependencies
@@ -109,7 +109,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: perl -V
         run: perl -V
       - name: Install Dependencies
@@ -136,7 +136,7 @@ jobs:
       AUTOMATED_TESTING: 1
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: perl -V
         run: perl -V
       - name: Install Dependencies
@@ -168,7 +168,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: perl -V
         run: perl -V
       - name: Install Dependencies
@@ -201,7 +201,7 @@ jobs:
       AUTOMATED_TESTING: 1
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: perl -V
         run: perl -V
       - name: Install Dependencies
@@ -257,7 +257,7 @@ jobs:
       image: perldocker/perl-tester:${{ matrix.perl-version }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install expat
         run: |
           apt-get update && apt-get install -y --no-install-recommends libexpat1-dev
@@ -295,7 +295,7 @@ jobs:
             pkginstall: pkgin -y install perl expat || true
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         timeout-minutes: 5
 
       - name: Test on ${{ matrix.os.name }}
@@ -325,7 +325,7 @@ jobs:
       AUTOMATED_TESTING: 1
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install dependencies
         run: |
           dnf -y install perl expat-devel git make gcc patch
@@ -356,7 +356,7 @@ jobs:
       RELEASE_TESTING: 1
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Perl
         run: brew install perl
       - name: expat version
@@ -377,7 +377,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Perl
         run: |
           choco install strawberryperl
