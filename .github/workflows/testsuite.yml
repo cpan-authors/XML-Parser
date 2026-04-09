@@ -87,6 +87,7 @@ jobs:
       - name: Upload Perl coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: cover_db/cover.json
           flags: perl
           name: perl-coverage
@@ -94,6 +95,7 @@ jobs:
       - name: Upload XS/C coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: xs_coverage.lcov
           flags: xs
           name: xs-coverage
