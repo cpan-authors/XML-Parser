@@ -127,11 +127,62 @@ the _Expat_ object, not the Parser object.
         declaration, setting this to a true value allows the external DTD to be read,
         and parameter entities to be parsed and expanded.
 
+        **Implicit vs explicit parameter entity parsing:** When `ParseParamEnt` is
+        not set, parameter entity references (e.g. `%foo;`) in the internal DTD
+        subset are passed through to the **Default** handler as literal text. This is
+        the mode that XML::Twig and other DTD round-tripping tools rely on.
+
+        When `ParseParamEnt` is set to a true value, or when a declaration handler
+        (**Entity**, **Element**, or **Attlist**) is registered, parameter entity parsing
+        is activated. In this mode, PE references are resolved by expat (via the
+        **ExternEnt** handler) and subsequent declarations are routed to their
+        dedicated declaration handlers instead of the Default handler.
+
     - NoLWP
 
         This option has no effect if the ExternEnt or ExternEntFin handlers are
         directly set. Otherwise, if true, it forces the use of a file based external
         entity handler.
+
+    - BillionLaughsAttackProtectionMaximumAmplification
+
+        Sets the maximum amplification factor for the Billion Laughs attack
+        protection.  See ["SECURITY"](#security) below for details.
+
+        This is an Expat option.
+        Requires libexpat >= 2.4.0 built with `XML_DTD` or `XML_GE`.
+
+    - BillionLaughsAttackProtectionActivationThreshold
+
+        Sets the activation threshold (in bytes) for the Billion Laughs attack
+        protection.  See ["SECURITY"](#security) below for details.
+
+        This is an Expat option.
+        Requires libexpat >= 2.4.0 built with `XML_DTD` or `XML_GE`.
+
+    - AllocTrackerMaximumAmplification
+
+        Sets the maximum amplification factor for the allocation tracker.
+        See ["SECURITY"](#security) below for details.
+
+        This is an Expat option.
+        Requires libexpat >= 2.7.2 built with `XML_DTD` or `XML_GE`.
+
+    - AllocTrackerActivationThreshold
+
+        Sets the activation threshold (in bytes) for the allocation tracker.
+        See ["SECURITY"](#security) below for details.
+
+        This is an Expat option.
+        Requires libexpat >= 2.7.2 built with `XML_DTD` or `XML_GE`.
+
+    - ReparseDeferralEnabled
+
+        Enables or disables reparse deferral, a security mechanism that prevents
+        certain token-boundary attacks.  See ["SECURITY"](#security) below for details.
+
+        This is an Expat option.
+        Requires libexpat >= 2.6.0.
 
     - Non\_Expat\_Options
 
@@ -528,6 +579,71 @@ the parser:
 
 This will include 2 lines of context on either side of the error in the
 error message.
+
+# SECURITY
+
+XML::Parser relies on the expat C library for parsing. Modern versions of
+expat include several security mechanisms that can be tuned through
+constructor options passed to `new()`. These options are forwarded directly
+to [XML::Parser::Expat](https://metacpan.org/pod/XML%3A%3AParser%3A%3AExpat) and take effect for every subsequent `parse`,
+`parsefile`, or `parse_start` call on the parser instance.
+
+All of these options will `croak` at runtime if the underlying libexpat does
+not support them.
+
+## Billion Laughs Attack Protection
+
+The Billion Laughs attack (also known as an XML bomb) uses deeply nested
+entity definitions to cause exponential expansion, consuming memory and CPU.
+Expat >= 2.4.0 (built with `XML_DTD` or `XML_GE`) includes built-in
+protection controlled by two parameters:
+
+- **BillionLaughsAttackProtectionMaximumAmplification**
+
+    The maximum ratio between the size of the expanded output and the size of
+    the input.  For example, a value of `100.0` means the parser will abort if
+    entity expansion would produce output more than 100 times the size of the
+    input.
+
+- **BillionLaughsAttackProtectionActivationThreshold**
+
+    The number of bytes of expanded output before the amplification limit takes
+    effect.  This prevents false positives on small documents that happen to
+    have a high amplification ratio.
+
+## Allocation Tracker
+
+Expat >= 2.7.2 (built with `XML_DTD` or `XML_GE`) adds a second layer
+of amplification tracking through the allocation tracker, which measures
+memory allocation rather than output size:
+
+- **AllocTrackerMaximumAmplification**
+
+    The maximum ratio of allocated memory to input size.
+
+- **AllocTrackerActivationThreshold**
+
+    The number of bytes of allocation before the limit takes effect.
+
+## Reparse Deferral
+
+Expat >= 2.6.0 includes reparse deferral, which prevents attacks that
+exploit token boundaries.  Rather than reparsing incomplete tokens
+immediately, the parser defers until more input arrives.
+
+- **ReparseDeferralEnabled**
+
+    A boolean.  Set to a true value to enable reparse deferral, or `0` to
+    disable it.
+
+For full details on each option, see ["new" in XML::Parser::Expat](https://metacpan.org/pod/XML%3A%3AParser%3A%3AExpat#new).
+
+    # Example: tighten Billion Laughs limits
+    my $parser = XML::Parser->new(
+      Style => 'Tree',
+      BillionLaughsAttackProtectionMaximumAmplification => 50,
+      BillionLaughsAttackProtectionActivationThreshold  => 1024,
+    );
 
 # AUTHORS
 
