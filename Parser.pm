@@ -291,7 +291,7 @@ sub file_ext_ent_handler {
     }
 
     require IO::File;
-    my $fh = IO::File->new($path);
+    my $fh = IO::File->new($path, '<');
     unless ( defined $fh ) {
         $xp->{ErrorMessage} .= "Failed to open $path:\n$!";
         return undef;
