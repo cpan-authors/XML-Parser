@@ -322,7 +322,7 @@ sub file_ext_ent_cleanup {
 
 __END__
 
-=for markdown [![Build Status](https://github.com/cpan-authors/XML-Parser/actions/workflows/testsuite.yml/badge.svg)](https://github.com/cpan-authors/XML-Parser/actions/workflows/testsuite.yml)
+=for markdown [![Build Status](https://github.com/cpan-authors/XML-Parser/actions/workflows/testsuite.yml/badge.svg)](https://github.com/cpan-authors/XML-Parser/actions/workflows/testsuite.yml) [![Coverage](https://codecov.io/gh/cpan-authors/XML-Parser/graph/badge.svg)](https://codecov.io/gh/cpan-authors/XML-Parser)
 
 =head1 NAME
 
