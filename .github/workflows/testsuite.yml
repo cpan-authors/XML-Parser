@@ -51,10 +51,18 @@ jobs:
         uses: perl-actions/install-with-cpm@v1
         with:
           cpanfile: "cpanfile"
-          install: |
-            Devel::Cover
-            Devel::Cover::Report::Codecov
-            JSON::MaybeXS
+      - name: Install coverage dependencies
+        uses: perl-actions/install-with-cpm@v1
+        with:
+          install: "Devel::Cover"
+      - name: Install Codecov reporter
+        uses: perl-actions/install-with-cpm@v1
+        with:
+          install: "Devel::Cover::Report::Codecov"
+      - name: Install JSON::MaybeXS
+        uses: perl-actions/install-with-cpm@v1
+        with:
+          install: "JSON::MaybeXS"
       - name: expat version
         run: pkg-config --modversion expat 2>/dev/null || true
       - name: Build with coverage flags
