@@ -23,7 +23,7 @@ jobs:
       - name: perl -V
         run: perl -V
       - name: Install Dependencies
-        uses: perl-actions/install-with-cpm@v1
+        uses: perl-actions/install-with-cpm@v2
         with:
           cpanfile: "cpanfile"
       - name: expat version
@@ -48,19 +48,19 @@ jobs:
       - name: Install system dependencies
         run: sudo apt-get update && sudo apt-get install -y lcov
       - name: Install Dependencies
-        uses: perl-actions/install-with-cpm@v1
+        uses: perl-actions/install-with-cpm@v2
         with:
           cpanfile: "cpanfile"
       - name: Install coverage dependencies
-        uses: perl-actions/install-with-cpm@v1
+        uses: perl-actions/install-with-cpm@v2
         with:
           install: "Devel::Cover"
       - name: Install Codecov reporter
-        uses: perl-actions/install-with-cpm@v1
+        uses: perl-actions/install-with-cpm@v2
         with:
           install: "Devel::Cover::Report::Codecov"
       - name: Install JSON::MaybeXS
-        uses: perl-actions/install-with-cpm@v1
+        uses: perl-actions/install-with-cpm@v2
         with:
           install: "JSON::MaybeXS"
       - name: expat version
@@ -113,7 +113,7 @@ jobs:
       - name: perl -V
         run: perl -V
       - name: Install Dependencies
-        uses: perl-actions/install-with-cpm@v1
+        uses: perl-actions/install-with-cpm@v2
         with:
           cpanfile: "cpanfile"
       - name: Remove LWP::UserAgent
@@ -140,7 +140,7 @@ jobs:
       - name: perl -V
         run: perl -V
       - name: Install Dependencies
-        uses: perl-actions/install-with-cpm@v1
+        uses: perl-actions/install-with-cpm@v2
         with:
           cpanfile: "cpanfile"
       - name: Install libasan
@@ -172,7 +172,7 @@ jobs:
       - name: perl -V
         run: perl -V
       - name: Install Dependencies
-        uses: perl-actions/install-with-cpm@v1
+        uses: perl-actions/install-with-cpm@v2
         with:
           cpanfile: "cpanfile"
       - name: expat version
@@ -205,7 +205,7 @@ jobs:
       - name: perl -V
         run: perl -V
       - name: Install Dependencies
-        uses: perl-actions/install-with-cpm@v1
+        uses: perl-actions/install-with-cpm@v2
         with:
           cpanfile: "cpanfile"
       - name: Install XML-Parser from checkout
@@ -218,7 +218,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends libxml-perl libpath-tiny-perl
       - name: Install Dependencies
-        uses: perl-actions/install-with-cpm@v1.9
+        uses: perl-actions/install-with-cpm@v2
         with:
           install: ${{ matrix.module }}
           tests: true
@@ -266,7 +266,7 @@ jobs:
       - name: perl -V
         run: perl -V
       - name: Install Dependencies
-        uses: perl-actions/install-with-cpm@v1
+        uses: perl-actions/install-with-cpm@v2
         with:
           sudo: false
           cpanfile: "cpanfile"
@@ -334,7 +334,7 @@ jobs:
       - name: perl -V
         run: perl -V
       - name: Install Dependencies
-        uses: perl-actions/install-with-cpm@v1
+        uses: perl-actions/install-with-cpm@v2
         with:
           sudo: false
           cpanfile: "cpanfile"
@@ -364,7 +364,7 @@ jobs:
       - name: perl -V
         run: perl -V
       - name: Install Dependencies
-        uses: perl-actions/install-with-cpm@v1
+        uses: perl-actions/install-with-cpm@v2
         with:
           sudo: false
           cpanfile: "cpanfile"
@@ -390,7 +390,7 @@ jobs:
       - name: perl -V
         run: perl -V
       - name: Install Dependencies
-        uses: perl-actions/install-with-cpm@v1
+        uses: perl-actions/install-with-cpm@v2
         with:
           sudo: false
           cpanfile: "cpanfile"
