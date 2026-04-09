@@ -824,7 +824,7 @@ doctypeStart(void *userData,
   cbv->doctype_sysid = NULL;
   if (sysid) {
     Newx(cbv->doctype_sysid, strlen(sysid) + 1, char);
-    strcpy(cbv->doctype_sysid, sysid);
+    Copy(sysid, cbv->doctype_sysid, strlen(sysid) + 1, char);
   }
 
   if (cbv->doctyp_sv && SvTRUE(cbv->doctyp_sv)) {
@@ -1059,7 +1059,7 @@ externalEntityRef(XML_Parser parser,
 
 	  (void)POPs;
 	  hold = SvPV(ERRSV, len);
-	  New(326, errmsg, len + 1, char);
+	  Newx(errmsg, len + 1, char);
 	  if (len)
 	    Copy(hold, errmsg, len, char);
 	  errmsg[len] = '\0';
@@ -1319,9 +1319,9 @@ XML_ParserCreate(self_sv, enc_sv, namespaces)
 	  char *enc = (char *) (SvTRUE(enc_sv) ? SvPV_nolen(enc_sv) : 0);
 	  SV ** spp;
 
-	  Newz(320, cbv, 1, CallbackVector);
+	  Newxz(cbv, 1, CallbackVector);
 	  cbv->self_sv = SvREFCNT_inc(self_sv);
-	  Newz(325, cbv->st_serial_stack, 1024, unsigned int);
+	  Newxz(cbv->st_serial_stack, 1024, unsigned int);
 	  cbv->st_serial_stacksize = 1024;
 	  spp = hv_fetch((HV*)SvRV(cbv->self_sv), "NoExpand", 8, 0);
 	  if (spp && SvTRUE(*spp))
@@ -1968,7 +1968,7 @@ GenerateNSName(name, xml_namespace, table, list)
 	  nsstr = SvPV(xml_namespace, nslen);
 
 	  /* Form a namespace-name string that looks like expat's */
-	  New(321, buff, nmlen + nslen + 2, char);
+	  Newx(buff, nmlen + nslen + 2, char);
 	  bp = buff;
 	  blim = bp + nslen;
 	  while (bp < blim)
@@ -2173,7 +2173,7 @@ XML_LoadEncoding(data, size)
 
 	      RETVAL = newSVpvn(emh->name, namelen);
 
-	      New(322, entry, 1, Encinfo);
+	      Newx(entry, 1, Encinfo);
 	      if (! entry)
 	        croak("Could not allocate encoding entry");
 
@@ -2187,13 +2187,13 @@ XML_LoadEncoding(data, size)
 	      bm = (unsigned short *) (((char *) pfx)
 				       + sizeof(PrefixMap) * pfxsize);
 
-	      New(323, entry->prefixes, pfxsize, PrefixMap);
+	      Newx(entry->prefixes, pfxsize, PrefixMap);
 	      if (! entry->prefixes) {
 	        Safefree(entry);
 	        croak("Could not allocate encoding prefixes");
 	      }
 
-	      New(324, entry->bytemap, bmsize, unsigned short);
+	      Newx(entry->bytemap, bmsize, unsigned short);
 	      if (! entry->bytemap) {
 	        Safefree(entry->prefixes);
 	        Safefree(entry);
