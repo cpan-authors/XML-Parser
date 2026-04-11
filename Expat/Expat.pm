@@ -314,7 +314,7 @@ sub expand_ns_prefix {
         return ( defined($stack) and @$stack ) ? $stack->[-1] : undef;
     }
 
-    return undef;
+    return;
 }
 
 sub current_ns_prefixes {
@@ -676,7 +676,7 @@ sub children {
     if ( defined $children ) {
         return @$children;
     }
-    return undef;
+    return;
 }
 
 sub asString {
