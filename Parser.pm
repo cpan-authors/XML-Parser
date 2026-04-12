@@ -9,6 +9,7 @@
 package XML::Parser;
 
 use strict;
+use warnings;
 
 our ( $VERSION, $LWP_load_failed );
 
