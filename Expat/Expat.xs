@@ -2353,12 +2353,18 @@ XML_Do_External_Parse(parser, result)
 	  }
 	  else if (SvROK(result) && isGV(SvRV(result))) {
 	    /* Lexical filehandle (open my $fh) - a reference to a glob */
+	    IO *io = GvIOp((GV*)SvRV(result));
+	    if (!io)
+	      croak("ExternEnt handler returned an unopened filehandle");
 	    RETVAL = parse_stream(parser,
-				  sv_2mortal(newRV_inc((SV*) GvIOp((GV*)SvRV(result)))));
+				  sv_2mortal(newRV_inc((SV*) io)));
 	  }
 	  else if (isGV(result)) {
+	    IO *io = GvIOp(result);
+	    if (!io)
+	      croak("ExternEnt handler returned an unopened filehandle");
 	    RETVAL = parse_stream(parser,
-				  sv_2mortal(newRV_inc((SV*) GvIOp(result))));
+				  sv_2mortal(newRV_inc((SV*) io)));
 	  }
 	  else if (SvPOK(result)) {
 	    STRLEN  eslen;
