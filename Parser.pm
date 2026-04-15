@@ -146,8 +146,13 @@ sub parse_start {
     my $expatnb = XML::Parser::ExpatNB->new( @expat_options, @_ );
     $expatnb->setHandlers(%handlers);
 
-    &$init($expatnb)
-      if defined($init);
+    if (defined($init)) {
+        eval { &$init($expatnb) };
+        if ($@) {
+            $expatnb->release;
+            die $@;
+        }
+    }
 
     $expatnb->{_State_} = 1;
 
@@ -177,8 +182,13 @@ sub parse {
         $expat->base( $self->{Base} );
     }
 
-    &$init($expat)
-      if defined($init);
+    if (defined($init)) {
+        eval { &$init($expat) };
+        if ($@) {
+            $expat->release;
+            die $@;
+        }
+    }
 
     my @result = ();
     my $result;
@@ -190,15 +200,21 @@ sub parse {
     }
 
     if ( $result and defined($final) ) {
-        if (wantarray) {
-            @result = &$final($expat);
-        }
-        else {
-            $result = &$final($expat);
-        }
+        my $want = wantarray;
+        eval {
+            if ($want) {
+                @result = &$final($expat);
+            }
+            else {
+                $result = &$final($expat);
+            }
+        };
+        $err = $@;
     }
 
     $expat->release;
+
+    die $err if $err;
 
     return unless defined wantarray;
     return wantarray ? @result : $result;
