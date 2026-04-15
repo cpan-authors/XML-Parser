@@ -58,6 +58,7 @@ t/checklib_findcc.t
 t/checklib_tmpdir.t
 t/combine_chars.t		Test script
 t/context_tracking.t
+t/coverage_gaps.t
 t/current_byte.t
 t/current_length.t		Test script
 t/debug_multibyte.t
@@ -71,6 +72,7 @@ t/encoding.t			Test script
 t/error_hint.t
 t/error_string.t
 t/expat_version.t
+t/expat_xs_coverage.t
 t/ext.ent			External entity for parament.t test
 t/ext2.ent			External entity for parament.t test
 t/ext_ent_io_control.t
@@ -92,6 +94,7 @@ t/parament_internal.t		Test script
 t/parse_error_context.t
 t/parse_start.t
 t/parsefile_base_restore.t
+t/parser_api.t
 t/partial.t			Test script
 t/position_overflow.t
 t/recognized_string.t
@@ -99,6 +102,7 @@ t/security_api.t
 t/skip.t			Test script
 t/stream.t			Test script
 t/stream_attr_escape.t
+t/stream_delimiter.t
 t/stream_localize.t
 t/styles.t			Test script
 t/subs_inherited.t
