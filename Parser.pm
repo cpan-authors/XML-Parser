@@ -17,7 +17,7 @@ use Carp;
 
 BEGIN {
     require XML::Parser::Expat;
-    $VERSION = '2.57';
+    $VERSION = '2.58';
     die "Parser.pm and Expat.pm versions don't match"
       unless $VERSION eq $XML::Parser::Expat::VERSION;
 }
