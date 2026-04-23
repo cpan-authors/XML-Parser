@@ -1010,6 +1010,13 @@ For full details on each option, see L<XML::Parser::Expat/"new">.
     BillionLaughsAttackProtectionActivationThreshold  => 1024,
   );
 
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/> for more information.
+
 =head1 AUTHORS
 
 Larry Wall <F<larry@wall.org>> wrote version 1.0.

@@ -160,6 +160,8 @@ sub MY::postamble {
     return join "\n", @ret;
 }
 
+my $dist_version = MM->parse_version('Parser.pm');
+
 WriteMakefile1(
     ABSTRACT_FROM    => 'Parser.pm',
     AUTHOR           => 'Clark Cooper (coopercc@netheaven.com)',
@@ -167,6 +169,31 @@ WriteMakefile1(
     MIN_PERL_VERSION => '5.008',
     META_MERGE       => {
         'meta-spec' => { version => 2 },
+        provides => {
+            'XML::Parser' => {
+                file    => 'Parser.pm',
+                version => $dist_version,
+            },
+            'XML::Parser::Expat' => {
+                file    => 'Expat/Expat.pm',
+                version => $dist_version,
+            },
+            'XML::Parser::Style::Debug' => {
+                file    => 'Parser/Style/Debug.pm',
+            },
+            'XML::Parser::Style::Objects' => {
+                file    => 'Parser/Style/Objects.pm',
+            },
+            'XML::Parser::Style::Stream' => {
+                file    => 'Parser/Style/Stream.pm',
+            },
+            'XML::Parser::Style::Subs' => {
+                file    => 'Parser/Style/Subs.pm',
+            },
+            'XML::Parser::Style::Tree' => {
+                file    => 'Parser/Style/Tree.pm',
+            },
+        },
         resources => {
             bugtracker => {
                 web => 'https://github.com/cpan-authors/XML-Parser/issues',

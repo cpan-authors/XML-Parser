@@ -640,6 +640,13 @@ For full details on each option, see ["new" in XML::Parser::Expat](https://metac
       BillionLaughsAttackProtectionActivationThreshold  => 1024,
     );
 
+# LICENSE
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See [https://dev.perl.org/licenses/](https://dev.perl.org/licenses/) for more information.
+
 # AUTHORS
 
 Larry Wall <`larry@wall.org`> wrote version 1.0.
