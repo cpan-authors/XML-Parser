@@ -1431,7 +1431,7 @@ false otherwise.
 
 =item isname
 
-This method returns if the object is an element name.
+This method returns true if the object is an element name.
 
 =item ischoice
 
