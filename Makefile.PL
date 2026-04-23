@@ -166,9 +166,16 @@ WriteMakefile1(
     LICENSE          => 'perl',
     MIN_PERL_VERSION => '5.008',
     META_MERGE       => {
+        'meta-spec' => { version => 2 },
         resources => {
-            bugtracker => 'https://github.com/cpan-authors/XML-Parser/issues',
-            repository => 'https://github.com/cpan-authors/XML-Parser',
+            bugtracker => {
+                web => 'https://github.com/cpan-authors/XML-Parser/issues',
+            },
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/cpan-authors/XML-Parser.git',
+                web  => 'https://github.com/cpan-authors/XML-Parser',
+            },
         },
         prereqs => {
             runtime => {
