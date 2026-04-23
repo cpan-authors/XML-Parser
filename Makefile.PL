@@ -1,4 +1,6 @@
 use 5.008;    #Devel::CheckLib
+use strict;
+use warnings;
 use ExtUtils::MakeMaker;
 use lib './inc';
 use Devel::CheckLib;
@@ -8,8 +10,8 @@ install_share dist => 'share';
 use Config;
 use File::Spec;
 
-$expat_libpath = $ENV{EXPATLIBPATH} || '';
-$expat_incpath = $ENV{EXPATINCPATH} || '';
+my $expat_libpath = $ENV{EXPATLIBPATH} || '';
+my $expat_incpath = $ENV{EXPATINCPATH} || '';
 
 my @replacement_args;
 
