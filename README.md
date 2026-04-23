@@ -411,16 +411,11 @@ If Fixed is true, then this is a fixed attribute.
 This handler is called for DOCTYPE declarations. Name is the document type
 name. Sysid is the system id of the document type, if it was provided,
 otherwise it's undefined. Pubid is the public id of the document type,
-which will be undefined if no public id was given. Internal is the internal
-subset, given as a string. If there was no internal subset, it will be
-undefined. Internal will contain all whitespace, comments, processing
-instructions, and declarations seen in the internal subset. The declarations
-will be there whether or not they have been processed by another handler
-(except for unparsed entities processed by the Unparsed handler). However,
-comments and processing instructions will not appear if they've been processed
-by their respective handlers.
+which will be undefined if no public id was given. Internal will be
+true or false, indicating whether or not the doctype declaration contains
+an internal subset.
 
-## \* DoctypeFin                (Parser)
+## \* DoctypeFin                (Expat)
 
 This handler is called after parsing of the DOCTYPE declaration has finished,
 including any internal or external DTD declarations.
