@@ -213,4 +213,52 @@ my $simple_xml = '<root><child>text</child></root>';
     is($p->{Base}, 'saved_base', 'parsefile restores Base even after error');
 }
 
+# --- Init handler die releases parser (no circular ref leak) ---
+{
+    my $released = 0;
+    my $p = XML::Parser->new(
+        Handlers => {
+            Init => sub { die "init failed\n" },
+        },
+    );
+    eval { $p->parse('<root/>') };
+    like($@, qr/init failed/, 'Init handler die propagates correctly');
+    # Parser should still be usable after Init failure
+    my $ok = eval {
+        $p->setHandlers(Init => undef);
+        $p->parse('<root/>');
+        1;
+    };
+    ok($ok, 'Parser reusable after Init handler failure');
+}
+
+# --- Final handler die still releases parser ---
+{
+    my $p = XML::Parser->new(
+        Handlers => {
+            Final => sub { die "final failed\n" },
+        },
+    );
+    eval { $p->parse('<root/>') };
+    like($@, qr/final failed/, 'Final handler die propagates correctly');
+    # Parser should still be usable
+    my $ok = eval {
+        $p->setHandlers(Final => undef);
+        $p->parse('<root/>');
+        1;
+    };
+    ok($ok, 'Parser reusable after Final handler failure');
+}
+
+# --- parse_start Init handler die releases parser ---
+{
+    my $p = XML::Parser->new(
+        Handlers => {
+            Init => sub { die "init_nb failed\n" },
+        },
+    );
+    eval { $p->parse_start() };
+    like($@, qr/init_nb failed/, 'parse_start Init handler die propagates correctly');
+}
+
 done_testing;
