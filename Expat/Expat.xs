@@ -507,6 +507,7 @@ startElement(void *userData, const char *name, const char **atts)
 
       ENTER;
       SAVETMPS;
+      SAVEFREESV(elname);
 
       PUSHMARK(sp);
       EXTEND(sp, attlim - atts + 2);
@@ -518,7 +519,7 @@ startElement(void *userData, const char *name, const char **atts)
 
 	  attname = (do_ns ? gen_ns_name(*atts, cbv->nstab, cbv->nslst)
 		     : newUTF8SVpv((char *) *atts, 0));
-	    
+
 	  atts++;
 	  PUSHs(sv_2mortal(attname));
 	  if (*atts)
@@ -527,6 +528,7 @@ startElement(void *userData, const char *name, const char **atts)
       PUTBACK;
       call_sv(cbv->start_sv, G_DISCARD|G_VOID);
 
+      SvREFCNT_inc_simple_void(elname);
       FREETMPS;
       LEAVE;
     }
@@ -555,6 +557,7 @@ endElement(void *userData, const char *name)
     {
       ENTER;
       SAVETMPS;
+      SAVEFREESV(elname);
 
       PUSHMARK(sp);
       EXTEND(sp, 2);
@@ -563,6 +566,7 @@ endElement(void *userData, const char *name)
       PUTBACK;
       call_sv(cbv->end_sv, G_DISCARD|G_VOID);
 
+      SvREFCNT_inc_simple_void(elname);
       FREETMPS;
       LEAVE;
     }
