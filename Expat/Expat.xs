@@ -1416,6 +1416,7 @@ XML_ParserRelease(parser)
         CallbackVector * cbv = (CallbackVector *) XML_GetUserData(parser);
 
 	SvREFCNT_dec(cbv->self_sv);
+	cbv->self_sv = NULL;
       }
 
 void
@@ -1426,7 +1427,7 @@ XML_ParserFree(parser)
 	  CallbackVector * cbv = (CallbackVector *) XML_GetUserData(parser);
 
 	  Safefree(cbv->st_serial_stack);
-
+	  Safefree(cbv->doctype_sysid);
 
 	  /* Clean up any SVs that we have */
 	  /* (Note that self_sv must already be taken care of
