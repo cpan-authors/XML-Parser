@@ -38,6 +38,7 @@ push(@extras, DEFINE => join(' ', @defines)) if @defines;
 WriteMakefile(
     NAME	=> 'XML::Parser::Expat',
     C         => ['Expat.c'],
+    CCFLAGS   => "$Config{ccflags} -Wall",
     LIBS	=> $libs,
     XSPROTOARG => '-noprototypes',
     VERSION_FROM => 'Expat.pm',
