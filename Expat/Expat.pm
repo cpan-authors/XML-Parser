@@ -564,6 +564,15 @@ sub parse {
                     # reference of it yields a GLOB ref. (GH#201)
                     $ioref = *{$arg}{IO};
                 }
+                elsif ( ref($arg) ) {
+
+                    # Blessed glob (e.g. IO::String) not descended
+                    # from IO::Handle — extract IO slot if underlying
+                    # reftype is GLOB. (GH#268)
+                    require Scalar::Util;
+                    $ioref = *{$arg}{IO}
+                      if Scalar::Util::reftype($arg) eq 'GLOB';
+                }
                 elsif ( $arg =~ /\A[^\W\d]\w*(?:::\w+)*\z/
                     && defined *{$arg} )
                 {
