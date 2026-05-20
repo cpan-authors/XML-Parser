@@ -16,11 +16,14 @@ cpanfile
 
 # Build artifacts
 ^blib/
+/blib/
 ^pm_to_blib$
+/pm_to_blib$
 \.o$
 \.so$
 \.bs$
 \.c$
+^XML-Parser-\d
 
 # Coverage artifacts
 ^cover_db/
