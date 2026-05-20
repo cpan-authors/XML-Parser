@@ -21,7 +21,7 @@ unless ($found_enc_dir) {
     plan skip_all => 'No encoding files found in @Encoding_Path';
 }
 
-plan tests => 14;
+plan tests => 17;
 
 # ---------------------------------------------------------------
 # Test 1-2: Basic load by short name (uses @Encoding_Path search)
@@ -136,4 +136,112 @@ plan tests => 14;
     my $n2 = eval { XML::Parser::Expat::load_encoding('iso-8859-4') };
     ok( defined $n1, 'first encoding loaded' );
     ok( defined $n2, 'second encoding loaded' );
+}
+
+# ---------------------------------------------------------------
+# Test 15: bmap_start + len exceeding bmsize is rejected
+# Crafts a binary encmap with one PrefixMap whose bmap_start + len
+# overflows the bytemap, which would cause an out-of-bounds read
+# in convert_to_unicode if not caught at load time.
+# ---------------------------------------------------------------
+{
+    my $MAGIC  = 0xfeebface;
+    my $pfsize = 1;
+    my $bmsize = 10;
+
+    my $header = pack("N", $MAGIC)
+               . pack("a40", "BADBMAP")
+               . pack("n", $pfsize)
+               . pack("n", $bmsize)
+               . pack("N256", (0) x 256);
+
+    # bmap_start=5, len=10 => 5+10=15 > bmsize=10
+    my $pfx = pack("C", 0)              # min
+            . pack("C", 10)             # len
+            . pack("n", 5)              # bmap_start
+            . ("\0" x 32)               # ispfx
+            . ("\0" x 32);              # ischar
+
+    my $bm = pack("n10", (0) x 10);
+
+    my $tmpdir = File::Temp->newdir();
+    my $file   = File::Spec->catfile( $tmpdir, 'badbmap.enc' );
+    open( my $fh, '>', $file ) or die "Cannot create $file: $!";
+    binmode $fh;
+    print $fh $header . $pfx . $bm;
+    close $fh;
+
+    eval { XML::Parser::Expat::load_encoding($file) };
+    like( $@, qr/isn't an encmap file/,
+          'bmap_start + len > bmsize is rejected' );
+}
+
+# ---------------------------------------------------------------
+# Test 16: bmap_start overflow with len=0 (meaning 256) is rejected
+# ---------------------------------------------------------------
+{
+    my $MAGIC  = 0xfeebface;
+    my $pfsize = 1;
+    my $bmsize = 100;
+
+    my $header = pack("N", $MAGIC)
+               . pack("a40", "BADBMAP2")
+               . pack("n", $pfsize)
+               . pack("n", $bmsize)
+               . pack("N256", (0) x 256);
+
+    # bmap_start=0, len=0 (means 256) => 0+256=256 > bmsize=100
+    my $pfx = pack("C", 0)              # min
+            . pack("C", 0)              # len (0 => 256)
+            . pack("n", 0)              # bmap_start
+            . ("\0" x 32)               # ispfx
+            . ("\0" x 32);              # ischar
+
+    my $bm = pack("n100", (0) x 100);
+
+    my $tmpdir = File::Temp->newdir();
+    my $file   = File::Spec->catfile( $tmpdir, 'badbmap2.enc' );
+    open( my $fh, '>', $file ) or die "Cannot create $file: $!";
+    binmode $fh;
+    print $fh $header . $pfx . $bm;
+    close $fh;
+
+    eval { XML::Parser::Expat::load_encoding($file) };
+    like( $@, qr/isn't an encmap file/,
+          'bmap_start + 256 (len=0) > bmsize is rejected' );
+}
+
+# ---------------------------------------------------------------
+# Test 17: Valid bmap_start + len within bmsize is accepted
+# ---------------------------------------------------------------
+{
+    my $MAGIC  = 0xfeebface;
+    my $pfsize = 1;
+    my $bmsize = 20;
+
+    my $header = pack("N", $MAGIC)
+               . pack("a40", "GOODBMAP")
+               . pack("n", $pfsize)
+               . pack("n", $bmsize)
+               . pack("N256", (0) x 256);
+
+    # bmap_start=5, len=10 => 5+10=15 <= bmsize=20 => valid
+    my $pfx = pack("C", 0)              # min
+            . pack("C", 10)             # len
+            . pack("n", 5)              # bmap_start
+            . ("\0" x 32)               # ispfx
+            . ("\0" x 32);              # ischar
+
+    my $bm = pack("n20", (0) x 20);
+
+    my $tmpdir = File::Temp->newdir();
+    my $file   = File::Spec->catfile( $tmpdir, 'goodbmap.enc' );
+    open( my $fh, '>', $file ) or die "Cannot create $file: $!";
+    binmode $fh;
+    print $fh $header . $pfx . $bm;
+    close $fh;
+
+    my $name = eval { XML::Parser::Expat::load_encoding($file) };
+    ok( !$@, 'valid bmap_start within bmsize is accepted' )
+        or diag("Error: $@");
 }
