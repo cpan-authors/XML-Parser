@@ -1,2 +1,17 @@
 codecov:
   branch: main
+
+coverage:
+  status:
+    project:
+      default:
+        target: 70%
+        threshold: 1%
+    patch:
+      default:
+        target: 70%
+
+comment:
+  layout: "header, diff, flags, footer"
+  behavior: default
+  require_changes: true
