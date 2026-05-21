@@ -2098,7 +2098,10 @@ XML_ErrorString(code)
     PPCODE:
 	{
 	  const char *ret = XML_ErrorString(code);
-	  XPUSHs(sv_2mortal(newSVpv(ret, 0)));
+	  if (ret)
+	    XPUSHs(sv_2mortal(newSVpv(ret, 0)));
+	  else
+	    XPUSHs(&PL_sv_undef);
 	}
 
 void
