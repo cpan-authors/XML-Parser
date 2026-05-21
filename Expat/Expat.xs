@@ -2192,6 +2192,17 @@ XML_LoadEncoding(data, size)
 	      bm = (unsigned short *) (((char *) pfx)
 				       + sizeof(PrefixMap) * pfxsize);
 
+	      for (i = 0; i < pfxsize; i++) {
+		unsigned short bstart = ntohs(pfx[i].bmap_start);
+		unsigned int elen = pfx[i].len ? pfx[i].len : 256;
+		if ((unsigned int) bstart + elen > bmsize) {
+		  Safefree(entry);
+		  SvREFCNT_dec(RETVAL);
+		  RETVAL = &PL_sv_undef;
+		  goto load_encoding_done;
+		}
+	      }
+
 	      Newx(entry->prefixes, pfxsize, PrefixMap);
 	      if (! entry->prefixes) {
 	        Safefree(entry);
@@ -2230,6 +2241,7 @@ XML_LoadEncoding(data, size)
 	      }
 
 	      hv_store(EncodingTable, emh->name, namelen, sv, 0);
+	    load_encoding_done: ;
 	    }
 	  }
 	}
