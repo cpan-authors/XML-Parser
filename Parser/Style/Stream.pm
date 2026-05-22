@@ -28,11 +28,7 @@ sub Start {
     while (@_) {
         my $attr = shift;
         my $val  = shift;
-        $val =~ s/&/&amp;/g;
-        $val =~ s/</&lt;/g;
-        $val =~ s/>/&gt;/g;
-        $val =~ s/"/&quot;/g;
-        $_ .= ' ' . $attr . '="' . $val . '"';
+        $_ .= ' ' . $attr . '="' . $expat->xml_escape($val, '>', '"') . '"';
     }
     $_ .= '>';
 
