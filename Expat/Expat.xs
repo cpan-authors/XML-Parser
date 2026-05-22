@@ -2180,10 +2180,9 @@ XML_LoadEncoding(data, size)
 	      namelen = i;
 
 	      RETVAL = newSVpvn(emh->name, namelen);
+	      sv_2mortal(RETVAL);
 
 	      Newx(entry, 1, Encinfo);
-	      if (! entry)
-	        croak("Could not allocate encoding entry");
 
 	      entry->prefixes_size = pfxsize;
 	      entry->bytemap_size  = bmsize;
@@ -2200,24 +2199,14 @@ XML_LoadEncoding(data, size)
 		unsigned int elen = pfx[i].len ? pfx[i].len : 256;
 		if ((unsigned int) bstart + elen > bmsize) {
 		  Safefree(entry);
-		  SvREFCNT_dec(RETVAL);
 		  RETVAL = &PL_sv_undef;
 		  goto load_encoding_done;
 		}
 	      }
 
 	      Newx(entry->prefixes, pfxsize, PrefixMap);
-	      if (! entry->prefixes) {
-	        Safefree(entry);
-	        croak("Could not allocate encoding prefixes");
-	      }
 
 	      Newx(entry->bytemap, bmsize, unsigned short);
-	      if (! entry->bytemap) {
-	        Safefree(entry->prefixes);
-	        Safefree(entry);
-	        croak("Could not allocate encoding bytemap");
-	      }
 
 	      for (i = 0; i < pfxsize; i++, pfx++) {
 		PrefixMap *dest = &entry->prefixes[i];
@@ -2244,6 +2233,7 @@ XML_LoadEncoding(data, size)
 	      }
 
 	      hv_store(EncodingTable, emh->name, namelen, sv, 0);
+	      SvREFCNT_inc_simple_void_NN(RETVAL);
 	    load_encoding_done: ;
 	    }
 	  }
