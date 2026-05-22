@@ -494,6 +494,24 @@ This option has no effect if the ExternEnt or ExternEntFin handlers are
 directly set. Otherwise, if true, it forces the use of a file based external
 entity handler.
 
+=item * LWP_MaxEntitySize
+
+Maximum size in bytes for content fetched via the LWP external entity handler.
+If a response exceeds this limit, the entity is rejected and a parse error is
+raised.  Defaults to C<1_048_576> (1 MB).  Set to C<0> to disable the size
+limit entirely.
+
+This option has no effect when C<NoLWP> is set or when a custom C<ExternEnt>
+handler is provided.
+
+=item * LWP_Timeout
+
+Timeout in seconds for HTTP requests made by the LWP external entity handler.
+Defaults to C<30>.
+
+This option has no effect when C<NoLWP> is set or when a custom C<ExternEnt>
+handler is provided.
+
 =item * BillionLaughsAttackProtectionMaximumAmplification
 
 Sets the maximum amplification factor for the Billion Laughs attack
@@ -1008,6 +1026,32 @@ For full details on each option, see L<XML::Parser::Expat/"new">.
     Style => 'Tree',
     BillionLaughsAttackProtectionMaximumAmplification => 50,
     BillionLaughsAttackProtectionActivationThreshold  => 1024,
+  );
+
+=head2 External Entity Size Limits
+
+When using the LWP-based external entity handler (the default when LWP is
+available), entities fetched over HTTP are subject to a size limit and a
+request timeout.  This prevents denial-of-service attacks where a malicious
+DTD references an extremely large or slow remote resource.
+
+=over 4
+
+=item B<LWP_MaxEntitySize>
+
+Maximum response size in bytes.  Defaults to 1 MB (C<1_048_576>).  Set to
+C<0> to disable.
+
+=item B<LWP_Timeout>
+
+HTTP request timeout in seconds.  Defaults to C<30>.
+
+=back
+
+  # Example: allow up to 5 MB entities with a 60-second timeout
+  my $parser = XML::Parser->new(
+    LWP_MaxEntitySize => 5_242_880,
+    LWP_Timeout       => 60,
   );
 
 =head1 LICENSE

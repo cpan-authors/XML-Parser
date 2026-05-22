@@ -46,6 +46,14 @@ sub lwp_ext_ent_handler {
   unless (defined $ua) {
     $ua = $xp->{_lwpagent} = LWP::UserAgent->new();
     $ua->env_proxy();
+
+    my $max_size = $xp->{LWP_MaxEntitySize};
+    $max_size = 1_048_576 unless defined $max_size;
+    $ua->max_size($max_size) if $max_size;
+
+    my $timeout = $xp->{LWP_Timeout};
+    $timeout = 30 unless defined $timeout;
+    $ua->timeout($timeout);
   }
 
   my $req = HTTP::Request->new('GET', $uri);
@@ -53,6 +61,12 @@ sub lwp_ext_ent_handler {
   my $res = $ua->request($req);
   if ($res->is_error) {
     $xp->{ErrorMessage} .= "\n" . $res->status_line . " $uri";
+    return undef;
+  }
+
+  if ($res->header('Client-Aborted')) {
+    $xp->{ErrorMessage} .= "\nEntity too large (exceeds "
+      . $ua->max_size . " bytes): $uri";
     return undef;
   }
   
