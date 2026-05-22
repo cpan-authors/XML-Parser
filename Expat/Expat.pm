@@ -1,9 +1,7 @@
 package XML::Parser::Expat;
 
 use strict;
-
-# warnings not enabled globally: namespace methods use int() on strings
-# that may not be numeric and rely on 'no warnings "numeric"' locally.
+use warnings;
 
 use XSLoader;
 use Carp;

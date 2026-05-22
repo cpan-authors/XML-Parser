@@ -9,6 +9,7 @@
 package XML::Parser;
 
 use strict;
+use warnings;
 
 use URI;
 use URI::file;
