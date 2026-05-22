@@ -147,9 +147,70 @@ static void
 free_cbv(CallbackVector *cbv)
 {
   if (cbv) {
-    SvREFCNT_dec(cbv->self_sv);
+    /* self_sv is NULL when XML_ParserRelease has already been called */
+    if (cbv->self_sv)
+      SvREFCNT_dec(cbv->self_sv);
+
     Safefree(cbv->st_serial_stack);
     Safefree(cbv->doctype_sysid);
+
+    if (cbv->recstring)
+      SvREFCNT_dec(cbv->recstring);
+
+    if (cbv->start_sv)
+      SvREFCNT_dec(cbv->start_sv);
+
+    if (cbv->end_sv)
+      SvREFCNT_dec(cbv->end_sv);
+
+    if (cbv->char_sv)
+      SvREFCNT_dec(cbv->char_sv);
+
+    if (cbv->proc_sv)
+      SvREFCNT_dec(cbv->proc_sv);
+
+    if (cbv->cmnt_sv)
+      SvREFCNT_dec(cbv->cmnt_sv);
+
+    if (cbv->dflt_sv)
+      SvREFCNT_dec(cbv->dflt_sv);
+
+    if (cbv->entdcl_sv)
+      SvREFCNT_dec(cbv->entdcl_sv);
+
+    if (cbv->eledcl_sv)
+      SvREFCNT_dec(cbv->eledcl_sv);
+
+    if (cbv->attdcl_sv)
+      SvREFCNT_dec(cbv->attdcl_sv);
+
+    if (cbv->doctyp_sv)
+      SvREFCNT_dec(cbv->doctyp_sv);
+
+    if (cbv->doctypfin_sv)
+      SvREFCNT_dec(cbv->doctypfin_sv);
+
+    if (cbv->xmldec_sv)
+      SvREFCNT_dec(cbv->xmldec_sv);
+
+    if (cbv->unprsd_sv)
+      SvREFCNT_dec(cbv->unprsd_sv);
+
+    if (cbv->notation_sv)
+      SvREFCNT_dec(cbv->notation_sv);
+
+    if (cbv->extent_sv)
+      SvREFCNT_dec(cbv->extent_sv);
+
+    if (cbv->extfin_sv)
+      SvREFCNT_dec(cbv->extfin_sv);
+
+    if (cbv->startcd_sv)
+      SvREFCNT_dec(cbv->startcd_sv);
+
+    if (cbv->endcd_sv)
+      SvREFCNT_dec(cbv->endcd_sv);
+
     Safefree(cbv);
   }
 }
@@ -1426,73 +1487,8 @@ XML_ParserFree(parser)
 	{
 	  CallbackVector * cbv = (CallbackVector *) XML_GetUserData(parser);
 
-	  Safefree(cbv->st_serial_stack);
-	  Safefree(cbv->doctype_sysid);
-
-	  /* Clean up any SVs that we have */
-	  /* (Note that self_sv must already be taken care of
-	     or we couldn't be here */
-
-	  if (cbv->recstring)
-	    SvREFCNT_dec(cbv->recstring);
-
-	  if (cbv->start_sv)
-	    SvREFCNT_dec(cbv->start_sv);
-
-	  if (cbv->end_sv)
-	    SvREFCNT_dec(cbv->end_sv);
-
-	  if (cbv->char_sv)
-	    SvREFCNT_dec(cbv->char_sv);
-
-	  if (cbv->proc_sv)
-	    SvREFCNT_dec(cbv->proc_sv);
-
-	  if (cbv->cmnt_sv)
-	    SvREFCNT_dec(cbv->cmnt_sv);
-
-	  if (cbv->dflt_sv)
-	    SvREFCNT_dec(cbv->dflt_sv);
-
-	  if (cbv->entdcl_sv)
-	    SvREFCNT_dec(cbv->entdcl_sv);
-
-	  if (cbv->eledcl_sv)
-	    SvREFCNT_dec(cbv->eledcl_sv);
-
-	  if (cbv->attdcl_sv)
-	    SvREFCNT_dec(cbv->attdcl_sv);
-
-	  if (cbv->doctyp_sv)
-	    SvREFCNT_dec(cbv->doctyp_sv);
-
-	  if (cbv->doctypfin_sv)
-	    SvREFCNT_dec(cbv->doctypfin_sv);
-
-	  if (cbv->xmldec_sv)
-	    SvREFCNT_dec(cbv->xmldec_sv);
-
-	  if (cbv->unprsd_sv)
-	    SvREFCNT_dec(cbv->unprsd_sv);
-
-	  if (cbv->notation_sv)
-	    SvREFCNT_dec(cbv->notation_sv);
-
-	  if (cbv->extent_sv)
-	    SvREFCNT_dec(cbv->extent_sv);
-
-	  if (cbv->extfin_sv)
-	    SvREFCNT_dec(cbv->extfin_sv);
-
-	  if (cbv->startcd_sv)
-	    SvREFCNT_dec(cbv->startcd_sv);
-
-	  if (cbv->endcd_sv)
-	    SvREFCNT_dec(cbv->endcd_sv);
-
-	  /* ================ */
-	    
-	  Safefree(cbv);
+	  /* self_sv must already be taken care of via XML_ParserRelease */
+	  free_cbv(cbv);
 	  XML_ParserFree(parser);
 	}
 
