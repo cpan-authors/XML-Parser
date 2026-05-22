@@ -24,7 +24,6 @@ eval { $_share_dir = File::ShareDir::dist_dir('XML-Parser') };
     ( defined $_share_dir && -d $_share_dir ? ($_share_dir) : () ),
     grep( -d $_,
         map( File::Spec->catdir( $_, qw(XML Parser Encodings) ), @INC ) ),
-    File::Spec->curdir
 );
 
 XSLoader::load( 'XML::Parser::Expat', $VERSION );

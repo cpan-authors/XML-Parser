@@ -1143,6 +1143,8 @@ convert_to_unicode(void *data, const char *seq) {
 
     if (curpfx->ispfx[bndx] & bmsk) {
       index = enc->bytemap[curpfx->bmap_start + offset];
+      if (index < 0 || index >= enc->prefixes_size)
+        break;
     }
     else if (curpfx->ischar[bndx] & bmsk) {
       return enc->bytemap[curpfx->bmap_start + offset];
@@ -2231,6 +2233,28 @@ XML_LoadEncoding(data, size)
 
 	      for (i = 0; i < bmsize; i++)
 		entry->bytemap[i] = ntohs(bm[i]);
+
+	      for (i = 0; i < pfxsize; i++) {
+		PrefixMap *p = &entry->prefixes[i];
+		unsigned int elen = p->len ? p->len : 256;
+		int j;
+		for (j = 0; j < (int) elen; j++) {
+		  unsigned char byte = p->min + j;
+		  unsigned char bndx = byte >> 3;
+		  unsigned char bmsk = 1 << (byte & 0x7);
+		  if (p->ispfx[bndx] & bmsk) {
+		    unsigned short val = entry->bytemap[p->bmap_start + j];
+		    if (val >= pfxsize) {
+		      Safefree(entry->bytemap);
+		      Safefree(entry->prefixes);
+		      Safefree(entry);
+		      SvREFCNT_dec(RETVAL);
+		      RETVAL = &PL_sv_undef;
+		      goto load_encoding_done;
+		    }
+		  }
+		}
+	      }
 
 	      sv = newSViv(0);
 	      sv_setref_pv(sv, "XML::Parser::Encinfo", (void *) entry);

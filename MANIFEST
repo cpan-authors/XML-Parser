@@ -72,6 +72,7 @@ t/dtd_pe_default.t
 t/element_decl.t
 t/element_inspection.t
 t/encoding.t			Test script
+t/encoding_bounds.t
 t/error_hint.t
 t/error_string.t
 t/expat_guards.t
