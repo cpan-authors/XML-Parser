@@ -1143,6 +1143,8 @@ convert_to_unicode(void *data, const char *seq) {
 
     if (curpfx->ispfx[bndx] & bmsk) {
       index = enc->bytemap[curpfx->bmap_start + offset];
+      if (index >= enc->prefixes_size)
+        break;
     }
     else if (curpfx->ischar[bndx] & bmsk) {
       return enc->bytemap[curpfx->bmap_start + offset];
