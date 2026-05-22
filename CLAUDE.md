@@ -7,6 +7,19 @@
 - **Build**: `perl Makefile.PL && make && make test`
 - **Minimum Perl**: 5.008
 
+## GitHub target repository
+
+`cpan-authors/XML-Parser` is the canonical upstream. Although GitHub metadata marks it as a fork of `chorny/XML-Parser`, that is a historical artifact — `cpan-authors` is where all development happens.
+
+**Do NOT use fork detection** (`gh repo view --json parent`) to determine where to file issues or PRs. Always target `cpan-authors/XML-Parser` explicitly:
+
+```bash
+gh issue create --repo cpan-authors/XML-Parser --title "..." --body "..."
+gh pr create --draft --repo cpan-authors/XML-Parser --head toddr-bot:<branch> --title "..." --body "..."
+```
+
+Never create issues or PRs on `chorny/XML-Parser`.
+
 ## Validation
 
 A commit is not valid unless `make test` passes. Always run the full test suite before committing. If tests fail, fix them first — never commit broken code.
