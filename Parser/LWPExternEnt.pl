@@ -48,11 +48,26 @@ sub lwp_ext_ent_handler {
     $ua->env_proxy();
   }
 
+  my $max_size = $xp->{MaxEntitySize};
+  $max_size = 10_485_760 unless defined $max_size;
+  if ($max_size) {
+    $ua->max_size($max_size);
+  }
+  else {
+    $ua->max_size(undef);
+  }
+
   my $req = HTTP::Request->new('GET', $uri);
 
   my $res = $ua->request($req);
   if ($res->is_error) {
     $xp->{ErrorMessage} .= "\n" . $res->status_line . " $uri";
+    return undef;
+  }
+
+  if (($res->header('Client-Aborted') || '') eq 'max_size') {
+    $xp->{ErrorMessage}
+      .= "\nExternal entity size exceeded MaxEntitySize limit ($max_size bytes): $uri";
     return undef;
   }
   
