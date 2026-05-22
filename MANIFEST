@@ -1,116 +1,127 @@
 AI_POLICY.md
-Changes				Change log
+Changes
 CONTRIBUTING.md
-Expat/encoding.h		Header file; describes *.enc structure
-Expat/Expat.pm			XML::Parser::Expat module
-Expat/Expat.xs			Extension library
-Expat/Makefile.PL		perl MakeMaker script for XML::Parser::Expat
+Expat/blib/arch/.exists
+Expat/blib/arch/auto/XML/Parser/Expat/.exists
+Expat/blib/bin/.exists
+Expat/blib/lib/auto/XML/Parser/Expat/.exists
+Expat/blib/lib/XML/Parser/.exists
+Expat/blib/lib/XML/Parser/Expat.pm
+Expat/blib/man1/.exists
+Expat/blib/man3/.exists
+Expat/blib/script/.exists
+Expat/encoding.h
+Expat/Expat.pm
+Expat/Expat.xs
+Expat/Makefile.PL
+Expat/pm_to_blib
 Expat/ppport.h
-Expat/typemap			XS typemap
+Expat/typemap
 inc/Devel/CheckLib.pm
 LICENSE
-Makefile.PL			perl MakeMaker script for XML::Parser
-MANIFEST			This file
+Makefile.PL
+MANIFEST
 MANIFEST.SKIP
-Parser.pm			XML::Parser module
-Parser/Encodings/Japanese_Encodings.msg	Message about Japanese encodings.
-Parser/Encodings/README		Info about encoding maps
-Parser/LWPExternEnt.pl		LWP based external entity handler
-Parser/Style/Debug.pm		Debug style parser
-Parser/Style/Objects.pm		Objects style parser
-Parser/Style/Stream.pm		Stream style parser
-Parser/Style/Subs.pm		Subs style parser
-Parser/Style/Tree.pm		Tree style parser
+Parser.pm
+Parser/Encodings/Japanese_Encodings.msg
+Parser/Encodings/README
+Parser/LWPExternEnt.pl
+Parser/Style/Debug.pm
+Parser/Style/Objects.pm
+Parser/Style/Stream.pm
+Parser/Style/Subs.pm
+Parser/Style/Tree.pm
 README.md
-samples/canonical		A utility to generate canonical XML
-samples/canontst.xml		An xml document to demonstrate canonical
-samples/ctest.dtd		An external DTD used by canontst.xml
-samples/REC-xml-19980210.xml	The XML spec in xml form
-samples/xmlcomments		A utility to extract comments
-samples/xmlfilter		A utility to filter elements
-samples/xmlstats		A utility to report on element statistics
+samples/canonical
+samples/canontst.xml
+samples/ctest.dtd
+samples/REC-xml-19980210.xml
+samples/xmlcomments
+samples/xmlfilter
+samples/xmlstats
 SECURITY.md
-share/big5.enc			Big5 binary encoding map
-share/euc-kr.enc		EUC-KR binary encoding map
-share/ibm866.enc		ibm866 binary encoding map
-share/iso-8859-15.enc		ISO-8859-15 binary encoding map
-share/iso-8859-2.enc		ISO-8859-2 binary encoding map
-share/iso-8859-3.enc		ISO-8859-3 binary encoding map
-share/iso-8859-4.enc		ISO-8859-4 binary encoding map
-share/iso-8859-5.enc		ISO-8859-5 binary encoding map
-share/iso-8859-7.enc		ISO-8859-7 binary encoding map
-share/iso-8859-8.enc		ISO-8859-8 binary encoding map
-share/iso-8859-9.enc		ISO-8859-9 binary encoding map
-share/koi8-r.enc		koi8-r binary encoding map
-share/windows-1250.enc		cp1250-WinLatin2 binary encoding map
-share/windows-1251.enc		cp1251-Russian binary encoding map
-share/windows-1252.enc		cp1252-WinLatin1 binary encoding map
-share/windows-1255.enc		hebrew binary encoding map
-share/x-euc-jp-jisx0221.enc	X-euc-jp-jisx0221 encoding map
-share/x-euc-jp-unicode.enc	X-euc-jp-unicode encoding map
-share/x-sjis-cp932.enc		x-sjis-cp932 encoding map
-share/x-sjis-jdk117.enc		x-sjis-jdk117 encoding map
-share/x-sjis-jisx0221.enc	x-sjis-jisx0221 encoding map
-share/x-sjis-unicode.enc	x-sjis-unicode encoding map
-t/astress.t			Test script
+share/big5.enc
+share/euc-kr.enc
+share/ibm866.enc
+share/iso-8859-15.enc
+share/iso-8859-2.enc
+share/iso-8859-3.enc
+share/iso-8859-4.enc
+share/iso-8859-5.enc
+share/iso-8859-7.enc
+share/iso-8859-8.enc
+share/iso-8859-9.enc
+share/koi8-r.enc
+share/windows-1250.enc
+share/windows-1251.enc
+share/windows-1252.enc
+share/windows-1255.enc
+share/x-euc-jp-jisx0221.enc
+share/x-euc-jp-unicode.enc
+share/x-sjis-cp932.enc
+share/x-sjis-jdk117.enc
+share/x-sjis-jisx0221.enc
+share/x-sjis-unicode.enc
+t/astress.t
 t/bare_glob_filehandle.t
 t/blessed_glob_handle.t
-t/cdata.t			Test script
+t/cdata.t
 t/char_end_doc.t
 t/checklib_findcc.t
 t/checklib_tmpdir.t
-t/combine_chars.t		Test script
+t/combine_chars.t
 t/context_tracking.t
 t/coverage_gaps.t
 t/current_byte.t
-t/current_length.t		Test script
+t/current_length.t
 t/debug_multibyte.t
-t/decl.t			Test script
+t/decl.t
 t/deep_nesting.t
-t/defaulted.t			Test script
+t/defaulted.t
 t/dtd_pe_default.t
 t/element_decl.t
 t/element_inspection.t
-t/encoding.t			Test script
+t/encoding.t
 t/error_hint.t
 t/error_string.t
 t/expat_guards.t
+t/expat_options_method.t
 t/expat_version.t
 t/expat_xs_coverage.t
-t/ext.ent			External entity for parament.t test
-t/ext2.ent			External entity for parament.t test
+t/ext.ent
+t/ext2.ent
 t/ext_ent_io_control.t
 t/extern_ent_lexical_glob.t
-t/external_ent.t		Test script
-t/file.t			Test script
-t/file_open_scalar.t		Test script
-t/finish.t			Test script
-t/foo.dtd			External DTD for parament.t test
+t/external_ent.t
+t/file.t
+t/file_open_scalar.t
+t/finish.t
+t/foo.dtd
 t/foreign_dtd.t
 t/g_void.t
 t/get_base.t
 t/handler_die.t
 t/load_encoding.t
 t/memory_leak_symtab.t
-t/namespaces.t			Test script
+t/namespaces.t
 t/nolwp.t
-t/parament.t			Test script
-t/parament_internal.t		Test script
+t/parament.t
+t/parament_internal.t
 t/parse_error_context.t
 t/parse_start.t
 t/parsefile_base_restore.t
 t/parser_api.t
-t/partial.t			Test script
+t/partial.t
 t/position_overflow.t
 t/recognized_string.t
 t/return_undef_list_context.t
 t/security_api.t
-t/skip.t			Test script
-t/stream.t			Test script
+t/skip.t
+t/stream.t
 t/stream_attr_escape.t
 t/stream_delimiter.t
 t/stream_localize.t
-t/styles.t			Test script
+t/styles.t
 t/subs_inherited.t
 t/tree_entity_expand.t
 t/utf8_handling.t
@@ -118,3 +129,166 @@ t/utf8_stream.t
 t/xml_escape.t
 t/xpcarp.t
 t/xpcroak.t
+XML-Parser-2.57/AI_POLICY.md
+XML-Parser-2.57/blib/arch/.exists
+XML-Parser-2.57/blib/arch/auto/XML/Parser/.exists
+XML-Parser-2.57/blib/arch/auto/XML/Parser/Expat/.exists
+XML-Parser-2.57/blib/bin/.exists
+XML-Parser-2.57/blib/lib/auto/share/dist/XML-Parser/big5.enc
+XML-Parser-2.57/blib/lib/auto/share/dist/XML-Parser/euc-kr.enc
+XML-Parser-2.57/blib/lib/auto/share/dist/XML-Parser/ibm866.enc
+XML-Parser-2.57/blib/lib/auto/share/dist/XML-Parser/iso-8859-15.enc
+XML-Parser-2.57/blib/lib/auto/share/dist/XML-Parser/iso-8859-2.enc
+XML-Parser-2.57/blib/lib/auto/share/dist/XML-Parser/iso-8859-3.enc
+XML-Parser-2.57/blib/lib/auto/share/dist/XML-Parser/iso-8859-4.enc
+XML-Parser-2.57/blib/lib/auto/share/dist/XML-Parser/iso-8859-5.enc
+XML-Parser-2.57/blib/lib/auto/share/dist/XML-Parser/iso-8859-7.enc
+XML-Parser-2.57/blib/lib/auto/share/dist/XML-Parser/iso-8859-8.enc
+XML-Parser-2.57/blib/lib/auto/share/dist/XML-Parser/iso-8859-9.enc
+XML-Parser-2.57/blib/lib/auto/share/dist/XML-Parser/koi8-r.enc
+XML-Parser-2.57/blib/lib/auto/share/dist/XML-Parser/windows-1250.enc
+XML-Parser-2.57/blib/lib/auto/share/dist/XML-Parser/windows-1251.enc
+XML-Parser-2.57/blib/lib/auto/share/dist/XML-Parser/windows-1252.enc
+XML-Parser-2.57/blib/lib/auto/share/dist/XML-Parser/windows-1255.enc
+XML-Parser-2.57/blib/lib/auto/share/dist/XML-Parser/x-euc-jp-jisx0221.enc
+XML-Parser-2.57/blib/lib/auto/share/dist/XML-Parser/x-euc-jp-unicode.enc
+XML-Parser-2.57/blib/lib/auto/share/dist/XML-Parser/x-sjis-cp932.enc
+XML-Parser-2.57/blib/lib/auto/share/dist/XML-Parser/x-sjis-jdk117.enc
+XML-Parser-2.57/blib/lib/auto/share/dist/XML-Parser/x-sjis-jisx0221.enc
+XML-Parser-2.57/blib/lib/auto/share/dist/XML-Parser/x-sjis-unicode.enc
+XML-Parser-2.57/blib/lib/auto/XML/Parser/.exists
+XML-Parser-2.57/blib/lib/auto/XML/Parser/Expat/.exists
+XML-Parser-2.57/blib/lib/XML/.exists
+XML-Parser-2.57/blib/lib/XML/Parser.pm
+XML-Parser-2.57/blib/lib/XML/Parser/.exists
+XML-Parser-2.57/blib/lib/XML/Parser/Encodings/Japanese_Encodings.msg
+XML-Parser-2.57/blib/lib/XML/Parser/Encodings/README
+XML-Parser-2.57/blib/lib/XML/Parser/Expat.pm
+XML-Parser-2.57/blib/lib/XML/Parser/LWPExternEnt.pl
+XML-Parser-2.57/blib/lib/XML/Parser/Style/Debug.pm
+XML-Parser-2.57/blib/lib/XML/Parser/Style/Objects.pm
+XML-Parser-2.57/blib/lib/XML/Parser/Style/Stream.pm
+XML-Parser-2.57/blib/lib/XML/Parser/Style/Subs.pm
+XML-Parser-2.57/blib/lib/XML/Parser/Style/Tree.pm
+XML-Parser-2.57/blib/man1/.exists
+XML-Parser-2.57/blib/man3/.exists
+XML-Parser-2.57/blib/script/.exists
+XML-Parser-2.57/Changes
+XML-Parser-2.57/Expat/encoding.h
+XML-Parser-2.57/Expat/Expat.pm
+XML-Parser-2.57/Expat/Expat.xs
+XML-Parser-2.57/Expat/Makefile
+XML-Parser-2.57/Expat/Makefile.PL
+XML-Parser-2.57/Expat/pm_to_blib
+XML-Parser-2.57/Expat/ppport.h
+XML-Parser-2.57/Expat/typemap
+XML-Parser-2.57/inc/Devel/CheckLib.pm
+XML-Parser-2.57/LICENSE
+XML-Parser-2.57/Makefile
+XML-Parser-2.57/Makefile.PL
+XML-Parser-2.57/MANIFEST
+XML-Parser-2.57/MANIFEST.SKIP
+XML-Parser-2.57/META.json
+XML-Parser-2.57/META.yml
+XML-Parser-2.57/Parser.pm
+XML-Parser-2.57/Parser/Encodings/Japanese_Encodings.msg
+XML-Parser-2.57/Parser/Encodings/README
+XML-Parser-2.57/Parser/LWPExternEnt.pl
+XML-Parser-2.57/Parser/Style/Debug.pm
+XML-Parser-2.57/Parser/Style/Objects.pm
+XML-Parser-2.57/Parser/Style/Stream.pm
+XML-Parser-2.57/Parser/Style/Subs.pm
+XML-Parser-2.57/Parser/Style/Tree.pm
+XML-Parser-2.57/pm_to_blib
+XML-Parser-2.57/README.md
+XML-Parser-2.57/samples/canonical
+XML-Parser-2.57/samples/canontst.xml
+XML-Parser-2.57/samples/ctest.dtd
+XML-Parser-2.57/samples/REC-xml-19980210.xml
+XML-Parser-2.57/samples/xmlcomments
+XML-Parser-2.57/samples/xmlfilter
+XML-Parser-2.57/samples/xmlstats
+XML-Parser-2.57/share/big5.enc
+XML-Parser-2.57/share/euc-kr.enc
+XML-Parser-2.57/share/ibm866.enc
+XML-Parser-2.57/share/iso-8859-15.enc
+XML-Parser-2.57/share/iso-8859-2.enc
+XML-Parser-2.57/share/iso-8859-3.enc
+XML-Parser-2.57/share/iso-8859-4.enc
+XML-Parser-2.57/share/iso-8859-5.enc
+XML-Parser-2.57/share/iso-8859-7.enc
+XML-Parser-2.57/share/iso-8859-8.enc
+XML-Parser-2.57/share/iso-8859-9.enc
+XML-Parser-2.57/share/koi8-r.enc
+XML-Parser-2.57/share/windows-1250.enc
+XML-Parser-2.57/share/windows-1251.enc
+XML-Parser-2.57/share/windows-1252.enc
+XML-Parser-2.57/share/windows-1255.enc
+XML-Parser-2.57/share/x-euc-jp-jisx0221.enc
+XML-Parser-2.57/share/x-euc-jp-unicode.enc
+XML-Parser-2.57/share/x-sjis-cp932.enc
+XML-Parser-2.57/share/x-sjis-jdk117.enc
+XML-Parser-2.57/share/x-sjis-jisx0221.enc
+XML-Parser-2.57/share/x-sjis-unicode.enc
+XML-Parser-2.57/t/astress.t
+XML-Parser-2.57/t/bare_glob_filehandle.t
+XML-Parser-2.57/t/cdata.t
+XML-Parser-2.57/t/char_end_doc.t
+XML-Parser-2.57/t/checklib_findcc.t
+XML-Parser-2.57/t/checklib_tmpdir.t
+XML-Parser-2.57/t/combine_chars.t
+XML-Parser-2.57/t/context_tracking.t
+XML-Parser-2.57/t/coverage_gaps.t
+XML-Parser-2.57/t/current_byte.t
+XML-Parser-2.57/t/current_length.t
+XML-Parser-2.57/t/debug_multibyte.t
+XML-Parser-2.57/t/decl.t
+XML-Parser-2.57/t/deep_nesting.t
+XML-Parser-2.57/t/defaulted.t
+XML-Parser-2.57/t/dtd_pe_default.t
+XML-Parser-2.57/t/element_decl.t
+XML-Parser-2.57/t/element_inspection.t
+XML-Parser-2.57/t/encoding.t
+XML-Parser-2.57/t/error_hint.t
+XML-Parser-2.57/t/error_string.t
+XML-Parser-2.57/t/expat_version.t
+XML-Parser-2.57/t/expat_xs_coverage.t
+XML-Parser-2.57/t/ext.ent
+XML-Parser-2.57/t/ext2.ent
+XML-Parser-2.57/t/ext_ent_io_control.t
+XML-Parser-2.57/t/extern_ent_lexical_glob.t
+XML-Parser-2.57/t/external_ent.t
+XML-Parser-2.57/t/file.t
+XML-Parser-2.57/t/file_open_scalar.t
+XML-Parser-2.57/t/finish.t
+XML-Parser-2.57/t/foo.dtd
+XML-Parser-2.57/t/foreign_dtd.t
+XML-Parser-2.57/t/g_void.t
+XML-Parser-2.57/t/get_base.t
+XML-Parser-2.57/t/load_encoding.t
+XML-Parser-2.57/t/memory_leak_symtab.t
+XML-Parser-2.57/t/namespaces.t
+XML-Parser-2.57/t/nolwp.t
+XML-Parser-2.57/t/parament.t
+XML-Parser-2.57/t/parament_internal.t
+XML-Parser-2.57/t/parse_error_context.t
+XML-Parser-2.57/t/parse_start.t
+XML-Parser-2.57/t/parsefile_base_restore.t
+XML-Parser-2.57/t/parser_api.t
+XML-Parser-2.57/t/partial.t
+XML-Parser-2.57/t/position_overflow.t
+XML-Parser-2.57/t/recognized_string.t
+XML-Parser-2.57/t/security_api.t
+XML-Parser-2.57/t/skip.t
+XML-Parser-2.57/t/stream.t
+XML-Parser-2.57/t/stream_attr_escape.t
+XML-Parser-2.57/t/stream_delimiter.t
+XML-Parser-2.57/t/stream_localize.t
+XML-Parser-2.57/t/styles.t
+XML-Parser-2.57/t/subs_inherited.t
+XML-Parser-2.57/t/tree_entity_expand.t
+XML-Parser-2.57/t/utf8_handling.t
+XML-Parser-2.57/t/utf8_stream.t
+XML-Parser-2.57/t/xml_escape.t
+XML-Parser-2.57/t/xpcarp.t
+XML-Parser-2.57/t/xpcroak.t
