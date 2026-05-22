@@ -494,6 +494,15 @@ This option has no effect if the ExternEnt or ExternEntFin handlers are
 directly set. Otherwise, if true, it forces the use of a file based external
 entity handler.
 
+=item * NoNetwork
+
+When set to a true value, the default LWP external entity handler will refuse
+to fetch C<http://> and C<https://> URLs, only allowing local file access.
+This prevents Server-Side Request Forgery (SSRF) attacks when parsing
+untrusted XML. See L<"SECURITY"> below for details.
+
+B<Recommended for any application parsing untrusted XML.>
+
 =item * BillionLaughsAttackProtectionMaximumAmplification
 
 Sets the maximum amplification factor for the Billion Laughs attack
@@ -707,6 +716,10 @@ after giving a warning on the first external entity reference.
 
 The LWP external entity handler will use proxies defined in the environment
 (http_proxy, ftp_proxy, etc.).
+
+The LWP handler includes SSRF protections: a URL scheme whitelist (only
+C<file>, C<http>, C<https>) and private IP blocking. See L<"SECURITY"> for
+details and the C<NoNetwork> option.
 
 Please note that the LWP external entity handler reads the entire
 entity into a string and returns it, where as the file handler opens a
@@ -1008,6 +1021,50 @@ For full details on each option, see L<XML::Parser::Expat/"new">.
     Style => 'Tree',
     BillionLaughsAttackProtectionMaximumAmplification => 50,
     BillionLaughsAttackProtectionActivationThreshold  => 1024,
+  );
+
+=head2 External Entity SSRF Protection
+
+The default LWP-based external entity handler resolves C<SYSTEM> identifiers
+in DTD entity declarations. Without safeguards, an attacker can craft XML
+that forces the parser to fetch arbitrary URLs, enabling Server-Side Request
+Forgery (SSRF) attacks — for example, reaching cloud metadata endpoints
+(C<http://169.254.169.254/>) or scanning internal networks.
+
+B<Built-in protections> (always active in the default LWP handler):
+
+=over 4
+
+=item * B<URL scheme whitelist> — Only C<file>, C<http>, and C<https> schemes
+are permitted. Dangerous schemes like C<gopher>, C<ftp>, C<data>, and C<dict>
+are rejected.
+
+=item * B<Private IP blocking> — HTTP/HTTPS requests to private and reserved
+IP ranges are blocked: C<10.0.0.0/8>, C<172.16.0.0/12>, C<192.168.0.0/16>,
+C<169.254.0.0/16> (link-local/cloud metadata), C<127.0.0.0/8> (loopback),
+and IPv6 loopback (C<::1>).
+
+=back
+
+B<For untrusted XML>, use one or more of these additional measures:
+
+=over 4
+
+=item * Set C<< NoNetwork => 1 >> to block all HTTP/HTTPS fetches while
+still allowing local file entities.
+
+=item * Set C<< NoLWP => 1 >> to use the file-only handler (no network
+capability at all).
+
+=item * Install a custom C<ExternEnt> handler that returns C<undef> to
+disable all external entity resolution.
+
+=back
+
+  # Recommended for untrusted input:
+  my $parser = XML::Parser->new(
+    NoNetwork => 1,
+    Style     => 'Tree',
   );
 
 =head1 LICENSE
