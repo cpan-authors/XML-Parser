@@ -106,6 +106,7 @@ t/recognized_string.t
 t/return_undef_list_context.t
 t/security_api.t
 t/skip.t			Test script
+t/ssrf_protection.t
 t/stream.t			Test script
 t/stream_attr_escape.t
 t/stream_delimiter.t
