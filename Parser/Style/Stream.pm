@@ -32,6 +32,9 @@ sub Start {
         $val =~ s/</&lt;/g;
         $val =~ s/>/&gt;/g;
         $val =~ s/"/&quot;/g;
+        $val =~ s/\x09/&#9;/g;
+        $val =~ s/\x0a/&#10;/g;
+        $val =~ s/\x0d/&#13;/g;
         $_ .= ' ' . $attr . '="' . $val . '"';
     }
     $_ .= '>';

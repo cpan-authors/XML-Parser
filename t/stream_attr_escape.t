@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 7;
 use XML::Parser;
 
 # GH#101: Stream style Start handler must XML-escape attribute values
@@ -42,4 +42,25 @@ sub capture_stream_parse {
     my $xml = '<root attr="a &lt; b"/>';
     my $out = capture_stream_parse($xml);
     like( $out, qr/&lt;/, 'less-than in attribute value is escaped' );
+}
+
+# Test 4: CR in attribute value (&#13;) must survive round-trip
+{
+    my $xml = '<root attr="a&#13;b"/>';
+    my $out = capture_stream_parse($xml);
+    like( $out, qr/&#13;/, 'CR in attribute value is escaped as &#13;' );
+}
+
+# Test 5: LF in attribute value (&#10;) must survive round-trip
+{
+    my $xml = '<root attr="a&#10;b"/>';
+    my $out = capture_stream_parse($xml);
+    like( $out, qr/&#10;/, 'LF in attribute value is escaped as &#10;' );
+}
+
+# Test 6: TAB in attribute value (&#9;) must survive round-trip
+{
+    my $xml = '<root attr="a&#9;b"/>';
+    my $out = capture_stream_parse($xml);
+    like( $out, qr/&#9;/, 'TAB in attribute value is escaped as &#9;' );
 }
