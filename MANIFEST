@@ -91,6 +91,7 @@ t/g_void.t
 t/get_base.t
 t/handler_die.t
 t/load_encoding.t
+t/lwp_entity_limits.t
 t/memory_leak_symtab.t
 t/namespaces.t			Test script
 t/nolwp.t
