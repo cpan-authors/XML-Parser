@@ -433,14 +433,9 @@ sub xml_escape {
             $text =~ s/\'/\&apos;/g;
         }
         else {
-            my $rep = '&#' . sprintf( 'x%X', ord($_) ) . ';';
-            if (/\W/) {
-                my $ptrn = "\\$_";
-                $text =~ s/$ptrn/$rep/g;
-            }
-            else {
-                $text =~ s/$_/$rep/g;
-            }
+            my $rep  = '&#' . sprintf( 'x%X', ord($_) ) . ';';
+            my $ptrn = quotemeta($_);
+            $text =~ s/$ptrn/$rep/g;
         }
     }
     $text;
