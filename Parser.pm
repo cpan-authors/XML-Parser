@@ -34,7 +34,8 @@ sub new {
     $nonexopt->{Non_Expat_Options} = 1;
     $nonexopt->{Handlers}          = 1;
     $nonexopt->{_HNDL_TYPES}       = 1;
-    $nonexopt->{NoLWP}             = 1;
+    $nonexopt->{NoLWP}                  = 1;
+    $nonexopt->{UnsafeExternalEntities} = 1;
 
     $args{_HNDL_TYPES}          = {%XML::Parser::Expat::Handler_Setters};
     $args{_HNDL_TYPES}->{Init}  = 1;
@@ -147,6 +148,8 @@ sub parse_start {
     my $expatnb = XML::Parser::ExpatNB->new( @expat_options, @_ );
     $expatnb->setHandlers(%handlers);
 
+    $expatnb->{_Unsafe_Ext_Ent} = 1 if $self->{UnsafeExternalEntities};
+
     if (defined($init)) {
         eval { &$init($expatnb) };
         if ($@) {
@@ -178,6 +181,8 @@ sub parse {
     my $final    = delete $handlers{Final};
 
     $expat->setHandlers(%handlers);
+
+    $expat->{_Unsafe_Ext_Ent} = 1 if $self->{UnsafeExternalEntities};
 
     if ( $self->{Base} ) {
         $expat->base( $self->{Base} );
@@ -291,6 +296,21 @@ sub initial_ext_ent_handler {
 
 sub file_ext_ent_handler {
     my ( $xp, $base, $path ) = @_;
+
+    unless ( $xp->{_Unsafe_Ext_Ent} ) {
+        if ( $path =~ m!^(?:[\\/]|\w+:)! ) {
+            $xp->{ErrorMessage}
+              .= "System ID ($path) contains an absolute path"
+              . " (blocked for security; use UnsafeExternalEntities => 1 to allow)";
+            return undef;
+        }
+        if ( $path =~ m!(?:^|[\\/])\.\.(?:[\\/]|$)! ) {
+            $xp->{ErrorMessage}
+              .= "System ID ($path) contains directory traversal"
+              . " (blocked for security; use UnsafeExternalEntities => 1 to allow)";
+            return undef;
+        }
+    }
 
     # Prepend base only for relative paths
 
@@ -493,6 +513,15 @@ dedicated declaration handlers instead of the Default handler.
 This option has no effect if the ExternEnt or ExternEntFin handlers are
 directly set. Otherwise, if true, it forces the use of a file based external
 entity handler.
+
+=item * UnsafeExternalEntities
+
+If set to a true value, the default file-based external entity handler allows
+absolute paths and directory traversal (C<..>) in SYSTEM identifiers. By
+default, these are blocked to prevent XXE (XML External Entity) file
+disclosure attacks. See L<"SECURITY"> below for details.
+
+This option has no effect when a custom C<ExternEnt> handler is installed.
 
 =item * BillionLaughsAttackProtectionMaximumAmplification
 
@@ -1002,6 +1031,23 @@ disable it.
 =back
 
 For full details on each option, see L<XML::Parser::Expat/"new">.
+
+=head2 External Entity File Disclosure (XXE)
+
+The default file-based external entity handler rejects SYSTEM identifiers
+that contain absolute paths (e.g. C</etc/passwd>) or directory traversal
+components (C<..>). This prevents XML External Entity (XXE) attacks where a
+malicious document exfiltrates sensitive local files.
+
+If your application needs to resolve external entities with absolute paths or
+traversal, set C<UnsafeExternalEntities =E<gt> 1>:
+
+  my $parser = XML::Parser->new(
+    UnsafeExternalEntities => 1,
+  );
+
+Alternatively, install a custom C<ExternEnt> handler with your own path
+validation logic. See L<"ExternEnt"> for details.
 
   # Example: tighten Billion Laughs limits
   my $parser = XML::Parser->new(
