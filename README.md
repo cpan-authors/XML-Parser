@@ -144,6 +144,15 @@ the _Expat_ object, not the Parser object.
         directly set. Otherwise, if true, it forces the use of a file based external
         entity handler.
 
+    - UnsafeExternalEntities
+
+        If set to a true value, the default file-based external entity handler allows
+        absolute paths and directory traversal (`..`) in SYSTEM identifiers. By
+        default, these are blocked to prevent XXE (XML External Entity) file
+        disclosure attacks. See ["SECURITY"](#security) below for details.
+
+        This option has no effect when a custom `ExternEnt` handler is installed.
+
     - BillionLaughsAttackProtectionMaximumAmplification
 
         Sets the maximum amplification factor for the Billion Laughs attack
@@ -632,6 +641,23 @@ immediately, the parser defers until more input arrives.
     disable it.
 
 For full details on each option, see ["new" in XML::Parser::Expat](https://metacpan.org/pod/XML%3A%3AParser%3A%3AExpat#new).
+
+## External Entity File Disclosure (XXE)
+
+The default file-based external entity handler rejects SYSTEM identifiers
+that contain absolute paths (e.g. `/etc/passwd`) or directory traversal
+components (`..`). This prevents XML External Entity (XXE) attacks where a
+malicious document exfiltrates sensitive local files.
+
+If your application needs to resolve external entities with absolute paths or
+traversal, set `UnsafeExternalEntities => 1`:
+
+    my $parser = XML::Parser->new(
+      UnsafeExternalEntities => 1,
+    );
+
+Alternatively, install a custom `ExternEnt` handler with your own path
+validation logic. See ["ExternEnt"](#externent) for details.
 
     # Example: tighten Billion Laughs limits
     my $parser = XML::Parser->new(

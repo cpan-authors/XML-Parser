@@ -118,3 +118,4 @@ t/utf8_stream.t
 t/xml_escape.t
 t/xpcarp.t
 t/xpcroak.t
+t/xxe_path_restriction.t

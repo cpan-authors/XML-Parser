@@ -29,8 +29,9 @@ XML
 {
     my $chardata = '';
     my $p = XML::Parser->new(
-        NoLWP    => 1,
-        Handlers => { Char => sub { $chardata .= $_[1] } },
+        NoLWP                  => 1,
+        UnsafeExternalEntities => 1,
+        Handlers               => { Char => sub { $chardata .= $_[1] } },
     );
 
     eval { $p->parse($xml) };
@@ -43,7 +44,8 @@ XML
     local $XML::Parser::LWP_load_failed = 1;
     my $chardata = '';
     my $p = XML::Parser->new(
-        Handlers => { Char => sub { $chardata .= $_[1] } },
+        UnsafeExternalEntities => 1,
+        Handlers               => { Char => sub { $chardata .= $_[1] } },
     );
 
     eval { $p->parse($xml) };
