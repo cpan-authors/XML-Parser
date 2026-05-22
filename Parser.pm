@@ -131,14 +131,16 @@ sub setHandlers {
     return @ret;
 }
 
+sub _expat_options {
+    my ($self) = @_;
+    map { $_ => $self->{$_} }
+      grep { !exists $self->{Non_Expat_Options}{$_} }
+      keys %{$self};
+}
+
 sub parse_start {
     my $self          = shift;
-    my @expat_options = ();
-
-    for my $key ( keys %{$self} ) {
-        push( @expat_options, $key, $self->{$key} )
-          unless exists $self->{Non_Expat_Options}->{$key};
-    }
+    my @expat_options = $self->_expat_options;
 
     my %handlers = %{ $self->{Handlers} };
     my $init     = delete $handlers{Init};
@@ -166,11 +168,7 @@ sub parse_start {
 sub parse {
     my $self          = shift;
     my $arg           = shift;
-    my @expat_options = ();
-    for my $key ( keys %{$self} ) {
-        push( @expat_options, $key, $self->{$key} )
-          unless exists $self->{Non_Expat_Options}->{$key};
-    }
+    my @expat_options = $self->_expat_options;
 
     my $expat    = XML::Parser::Expat->new( @expat_options, @_ );
     my %handlers = %{ $self->{Handlers} };
