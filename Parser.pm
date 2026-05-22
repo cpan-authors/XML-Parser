@@ -488,6 +488,17 @@ is activated. In this mode, PE references are resolved by expat (via the
 B<ExternEnt> handler) and subsequent declarations are routed to their
 dedicated declaration handlers instead of the Default handler.
 
+=item * MaxEntitySize
+
+Sets the maximum size (in bytes) for external entities fetched via the LWP
+handler.  When an HTTP response exceeds this limit, the fetch is aborted and
+a parse error is raised.  Defaults to 10,485,760 (10 MB).  Set to C<0> to
+disable the size limit entirely.
+
+This option only affects the built-in LWP external entity handler.  It has
+no effect when using a custom ExternEnt handler or the file-based handler
+(NoLWP).
+
 =item * NoLWP
 
 This option has no effect if the ExternEnt or ExternEntFin handlers are
